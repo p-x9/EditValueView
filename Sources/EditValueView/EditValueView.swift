@@ -8,7 +8,7 @@
 import SwiftUI
 
 @available(iOS 14, *)
-struct EditValueView<Root, Value: Hashable>: View {
+public struct EditValueView<Root, Value: Hashable>: View {
     let target: Root
     let key: String
     let keyPath: PartialKeyPath<Root> //WritableKeyPath<Root, Value>
@@ -19,7 +19,7 @@ struct EditValueView<Root, Value: Hashable>: View {
     @Environment(\.presentationMode) private var presentationMode
     
     @_disfavoredOverload
-    init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.target = target
         self.key = key
         self.keyPath = keyPath
@@ -27,11 +27,11 @@ struct EditValueView<Root, Value: Hashable>: View {
         self._value = .init(initialValue: target[keyPath: keyPath])
     }
     
-    init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
         self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
     }
     
-    init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
         self.target = target
         self.key = key
         self.keyPath = keyPath
@@ -40,7 +40,7 @@ struct EditValueView<Root, Value: Hashable>: View {
         self._value = .init(initialValue: target[keyPath: keyPath] ?? defaultValue)
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -110,7 +110,7 @@ struct EditValueView<Root, Value: Hashable>: View {
         }
     }
     
-    func onUpdate(_ onUpdate: ((Root, Value) -> Void)?) -> Self {
+    public func onUpdate(_ onUpdate: ((Root, Value) -> Void)?) -> Self {
         var new = self
         new._onUpdate = onUpdate
         return new
