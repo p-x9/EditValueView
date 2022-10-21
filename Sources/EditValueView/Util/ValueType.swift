@@ -22,7 +22,7 @@ enum ValueType {
     
     case classOrStruct([String: ValueType])
     
-    case unknown
+    case unknown(String? = nil)
     
     var typeName: String {
         _typeName(nestDepth: 0)
@@ -69,16 +69,18 @@ enum ValueType {
             \(tab)}
             """
             
-        case .unknown:
-            return "unknown"
+        case let .unknown(name):
+            return name ?? "unknown"
         }
     }
 }
 
 extension ValueType {
     static func extractType(for value: Any?) -> ValueType {
+        let type = "\(type(of: value))"
+        
         guard let value = value else {
-            return .optional(.unknown)
+            return .optional(.unknown(type))
         }
         
         let mirror = Mirror(reflecting: value)
@@ -96,15 +98,15 @@ extension ValueType {
             return isOptional ? .optional(.string) : .string
             
         case let array as Array<Any>:
-            var type: ValueType = .unknown
+            var type: ValueType = .unknown(type)
             if let data = array.first  {
                 type = extractType(for: data)
             }
             return isOptional ? .optional(.array(type)) : .array(type)
             
         case let dictionary as Dictionary<AnyHashable, Any>:
-            var key: ValueType = .unknown
-            var value: ValueType = .unknown
+            var key: ValueType = .unknown()
+            var value: ValueType = .unknown()
             if let data = dictionary.first {
                 key = extractType(for: data.key)
                 value = extractType(for: data.value)
@@ -127,6 +129,6 @@ extension ValueType {
                 .classOrStruct(description)
         }
         
-        return isOptional ? .optional(.unknown) : .unknown
+        return isOptional ? .optional(.unknown(type)) : .unknown(type)
     }
 }

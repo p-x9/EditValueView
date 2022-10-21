@@ -93,6 +93,9 @@ public struct EditValueView<Root, Value: Hashable>: View {
                 .padding()
                 .border(.black, width: 0.5)
             
+        case _ where (value as? NSNumber) != nil:
+            CodableEditorView($value, key: key, textStyle: .single)
+            
         case let v as Binding<Date>:
             DateEditorView(v, key: key)
             
@@ -139,11 +142,17 @@ struct Item {
     var enum2: Enum2
     var color: Color
     var `codable`: ACodable = .init(text: "", number: 5)
+    var array = ["AA", "BB"]
+    var dictionary: [String: Int] = [
+        "AA": 0,
+        "BB": 234
+    ]
 }
 
 struct ACodable: Hashable, Codable {
     var text: String
     var number: Int
+    var double: Double = 0.4
     var optionalString: String? = "test"
     var nested: BCodable = .init(text: "", number: 0)
 }
@@ -164,26 +173,43 @@ struct EditValueView_Preview: PreviewProvider {
                                   color: .white)
         
         Group {
-            EditValueView(target, key: "name", keyPath: \Item.name)
-                .previewDisplayName("String")
+            Group {
+                EditValueView(target, key: "name", keyPath: \Item.name)
+                    .previewDisplayName("String")
+                
+                EditValueView(target, key: "bool", keyPath: \Item.bool)
+                    .previewDisplayName("Bool")
+                
+                EditValueView(target, key: "date", keyPath: \Item.date)
+                    .previewDisplayName("Date")
+                
+                EditValueView(target, key: "color", keyPath: \Item.color)
+                    .previewDisplayName("Color")
+                
+                EditValueView(target, key: "number", keyPath: \Item.codable.number)
+                    .previewDisplayName("Int")
+                
+                EditValueView(target, key: "double", keyPath: \Item.codable.double)
+                    .previewDisplayName("Double")
+            }
             
-            EditValueView(target, key: "bool", keyPath: \Item.bool)
-                .previewDisplayName("Bool")
-            
-            EditValueView(target, key: "date", keyPath: \Item.date)
-                .previewDisplayName("Date")
-            
-            EditValueView(target, key: "enum", keyPath: \Item.enum)
-                .previewDisplayName("Enum(CaseIterable)")
-            
-            EditValueView(target, key: "enum", keyPath: \Item.enum2)
-                .previewDisplayName("Enum(CaseIterable & RawRepresentable)")
-            
-            EditValueView(target, key: "color", keyPath: \Item.color)
-                .previewDisplayName("Color")
-            
+            Group {
+                EditValueView(target, key: "enum", keyPath: \Item.enum)
+                    .previewDisplayName("Enum(CaseIterable)")
+                
+                EditValueView(target, key: "enum", keyPath: \Item.enum2)
+                    .previewDisplayName("Enum(CaseIterable & RawRepresentable)")
+                
+                EditValueView(target, key: "array", keyPath: \Item.array)
+                    .previewDisplayName("Array")
+                
+                EditValueView(target, key: "dictionary", keyPath: \Item.dictionary)
+                    .previewDisplayName("Dictionary")
+            }
+
             EditValueView(target, key: "codable", keyPath: \Item.codable)
                 .previewDisplayName("Codable")
+
         }
     }
 }

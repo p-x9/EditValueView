@@ -10,17 +10,26 @@ import SwiftUI
 
 struct CodableEditorView<Value: Hashable>: View {
     
+    enum TextStyle {
+        case single
+        case multiline
+    }
+    
     let key: String
     @Binding private var value: Value
     @State private var text: String
     @State private var isValid: Bool
     
+    @State private var textStyle: TextStyle
+    
     private var rawValue: Value
     
-    init(_ value: Binding<Value>, key: String) {
+    init(_ value: Binding<Value>, key: String, textStyle: TextStyle = .multiline) {
         self._value = value
         self.key = key
         self.rawValue = value.wrappedValue
+        
+        self._textStyle = .init(initialValue: textStyle)
         
         let codableValue = value.wrappedValue as! Codable
         self._text = .init(initialValue: codableValue.jsonString ?? "")
@@ -29,23 +38,43 @@ struct CodableEditorView<Value: Hashable>: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Text(typeDescription())
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    .foregroundColor(.gray)
-                Spacer()
+            if textStyle == .multiline {
+                typeDescriptionView
             }
-            .padding()
-            .background(Color(UIColor.secondarySystemFill))
-            .cornerRadius(8)
             
-            Spacer()
-            
-            TextEditor(text: $text)
-                .border(.black, width: 0.5)
+            editor
                 .onChange(of: text) { newValue in
                     textChanged(text: newValue)
                 }
+            
+        }
+    }
+    
+    @ViewBuilder
+    var typeDescriptionView: some View {
+        HStack {
+            Text(typeDescription())
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundColor(.gray)
+            Spacer()
+        }
+        .padding()
+        .background(Color(UIColor.secondarySystemFill))
+        .cornerRadius(8)
+    }
+    
+    @ViewBuilder
+    var editor: some View {
+        switch textStyle {
+        case .single:
+            TextField("", text: $text)
+                .padding()
+                .border(.black, width: 0.5)
+            
+        case .multiline:
+            TextEditor(text: $text)
+                .border(.black, width: 0.5)
+                .padding(.vertical)
         }
     }
     
