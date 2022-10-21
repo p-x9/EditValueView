@@ -105,6 +105,9 @@ public struct EditValueView<Root, Value: Hashable>: View {
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
             
+        case _ where Value.self is any Codable.Type:
+            CodableEditorView($value, key: key)
+            
         default:
             Text("this type is currently not supported.")
         }
@@ -135,6 +138,20 @@ struct Item {
     var `enum`: Enum
     var enum2: Enum2
     var color: Color
+    var `codable`: ACodable = .init(text: "", number: 5)
+}
+
+struct ACodable: Hashable, Codable {
+    var text: String
+    var number: Int
+    var optionalString: String? = "test"
+    var nested: BCodable = .init(text: "", number: 0)
+}
+
+struct BCodable: Hashable, Codable {
+    var text: String
+    var number: Int
+    var optionalString: String? = nil
 }
 
 struct EditValueView_Preview: PreviewProvider {
@@ -164,6 +181,9 @@ struct EditValueView_Preview: PreviewProvider {
             
             EditValueView(target, key: "color", keyPath: \Item.color)
                 .previewDisplayName("Color")
+            
+            EditValueView(target, key: "codable", keyPath: \Item.codable)
+                .previewDisplayName("Codable")
         }
     }
 }
