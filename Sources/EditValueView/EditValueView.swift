@@ -58,6 +58,18 @@ public struct EditValueView<Root, Value: Hashable>: View {
                         .padding([.bottom])
                     Spacer()
                 }
+                
+                HStack {
+                    let type = "\(Value.self)"
+                    Text(type)
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.gray)
+                    Spacer()
+                }
+                .padding()
+                .background(Color(UIColor.secondarySystemFill))
+                .cornerRadius(8)
+                
                 editor
                     .padding(.vertical)
                 Spacer()
