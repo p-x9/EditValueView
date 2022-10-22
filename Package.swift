@@ -5,7 +5,8 @@ import PackageDescription
 let package = Package(
     name: "EditValueView",
     platforms: [
-        .iOS(.v14)
+        .iOS(.v14),
+        .macOS(.v11)
     ],
     products: [
         .library(
@@ -13,11 +14,15 @@ let package = Package(
             targets: ["EditValueView"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/p-x9/SwiftUIColor.git", exact: "0.0.4")
+    ],
     targets: [
         .target(
             name: "EditValueView",
-            dependencies: []
+            dependencies: [
+                .product(name: "SwiftUIColor", package: "SwiftUIColor")
+            ]
         ),
         .testTarget(
             name: "EditValueViewTests",
