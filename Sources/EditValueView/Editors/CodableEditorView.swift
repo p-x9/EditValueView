@@ -9,7 +9,7 @@
 import SwiftUI
 import SwiftUIColor
 
-struct CodableEditorView<Value: Hashable>: View {
+struct CodableEditorView<Value>: View {
     
     enum TextStyle {
         case single
