@@ -43,54 +43,71 @@ public struct EditValueView<Root, Value: Hashable>: View {
     
     public var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    let string: String = "Key: \(key)"
-                    Text(string)
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
-                HStack {
-                    let string: String = "Type: \(Value.self)"
-                    Text(string)
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundColor(.gray)
-                        .padding([.bottom])
-                    Spacer()
-                }
-                
-                HStack {
-                    let type = "\(Value.self)"
-                    Text(type)
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
-                .padding()
-                .background(Color.iOS.secondarySystemFill)
-                .cornerRadius(8)
-                
-                editor
-                    .padding(.vertical)
-                Spacer()
-            }
-            .padding()
-            .navigationTitle(key)
-            .toolbar {
-                ToolbarItemGroup(placement: .destructiveAction) {
-                    Button("Save") {
-                        save()
-                        presentationMode.wrappedValue.dismiss()
+            GeometryReader{ proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        header
+                        
+                        typeSection
+                        
+                        editor
+                            .padding(.vertical)
+                        Spacer()
                     }
-                }
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
+                    .padding()
+                    .frame(minHeight: proxy.size.height)
+                    .navigationTitle(key)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .destructiveAction) {
+                            Button("Save") {
+                                save()
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        }
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                let string: String = "Key: \(key)"
+                Text(string)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(.gray)
+                Spacer()
+            }
+            HStack {
+                let string: String = "Type: \(Value.self)"
+                Text(string)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(.gray)
+                    .padding([.bottom])
+                Spacer()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var typeSection: some View {
+        HStack {
+            let type = "\(Value.self)"
+            Text(type)
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundColor(.gray)
+            Spacer()
+        }
+        .padding()
+        .background(Color.iOS.secondarySystemFill)
+        .cornerRadius(8)
     }
     
     @ViewBuilder
