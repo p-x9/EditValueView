@@ -77,7 +77,6 @@ public struct EditValueView<Root, Value: Hashable>: View {
             }
             .padding()
             .navigationTitle(key)
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .destructiveAction) {
                     Button("Save") {
