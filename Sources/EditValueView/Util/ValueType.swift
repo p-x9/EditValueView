@@ -77,15 +77,19 @@ enum ValueType {
 
 extension ValueType {
     static func extractType(for value: Any?) -> ValueType {
-        let type = "\(type(of: value))"
-        
         guard let value = value else {
-            return .optional(.unknown(type))
+            return .optional(.unknown())
         }
         
         let mirror = Mirror(reflecting: value)
         
         let isOptional = mirror.displayStyle == .optional
+        
+        var type = "\(mirror.subjectType)"
+        if isOptional {
+            type.removeFirst(9)
+            type.removeLast(1)
+        }
         
         switch value {
         case _ as Int:

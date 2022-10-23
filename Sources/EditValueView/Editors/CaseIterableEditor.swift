@@ -19,17 +19,24 @@ struct CaseIterableEditor<Value: Hashable>: View {
     }
     
     var body: some View {
+        VStack {
+            editor
+        }
+    }
+    
+    @ViewBuilder
+    var editor: some View {
         switch Value.self {
         case let type as any (CaseIterable & RawRepresentable).Type:
             let allCases = type.allCases as! Array<Value>
             Picker(key, selection: $value) {
                 ForEach(allCases, id: \.hashValue) {
                     let rawValue = ($0 as! (any RawRepresentable)).rawValue
-                    let text = "\(rawValue)"
+                    let text = "\($0) (\(rawValue))"
                     Text(text).tag($0)
                 }
             }
-            .pickerStyle(.wheel)
+            .pickerStyle(.automatic)
             
         case let type as any CaseIterable.Type:
             let allCases = type.allCases as! Array<Value>
@@ -39,7 +46,7 @@ struct CaseIterableEditor<Value: Hashable>: View {
                     Text(text).tag($0)
                 }
             }
-            .pickerStyle(.wheel)
+            .pickerStyle(.automatic)
             
         default:
             Text("this type is currently not supported.")

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SwiftUIColor
 
 struct CodableEditorView<Value: Hashable>: View {
     
@@ -59,7 +60,7 @@ struct CodableEditorView<Value: Hashable>: View {
             Spacer()
         }
         .padding()
-        .background(Color(UIColor.secondarySystemFill))
+        .background(Color.iOS.secondarySystemFill)
         .cornerRadius(8)
     }
     

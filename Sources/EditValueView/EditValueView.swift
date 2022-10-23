@@ -6,6 +6,7 @@
 //
 //
 import SwiftUI
+//import SwiftUIColor
 
 @available(iOS 14, *)
 public struct EditValueView<Root, Value: Hashable>: View {
@@ -67,7 +68,7 @@ public struct EditValueView<Root, Value: Hashable>: View {
                     Spacer()
                 }
                 .padding()
-                .background(Color(UIColor.secondarySystemFill))
+                .background(Color.iOS.secondarySystemFill)
                 .cornerRadius(8)
                 
                 editor
@@ -76,7 +77,6 @@ public struct EditValueView<Root, Value: Hashable>: View {
             }
             .padding()
             .navigationTitle(key)
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .destructiveAction) {
                     Button("Save") {
