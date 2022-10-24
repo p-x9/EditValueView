@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CaseIterableEditor<Value: Equatable>: View {
+struct CaseIterableEditor<Value>: View {
     
     let key: String
     @Binding private var value: Value
@@ -23,7 +23,7 @@ struct CaseIterableEditor<Value: Equatable>: View {
         let type = Value.self as! any CaseIterable.Type
         self.allCases = type.allCases as! Array<Value>
         
-        self._index = .init(wrappedValue: allCases.firstIndex(of: value.wrappedValue) ?? 0)
+        self._index = .init(wrappedValue: allCases.firstIndex(where: { "\($0)" == "\(value.wrappedValue)" }) ?? 0)
     }
     
     var body: some View {
