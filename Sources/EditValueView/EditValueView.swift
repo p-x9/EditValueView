@@ -9,7 +9,7 @@ import SwiftUI
 //import SwiftUIColor
 
 @available(iOS 14, *)
-public struct EditValueView<Root, Value: Equatable>: View {
+public struct EditValueView<Root, Value>: View {
     let target: Root
     let key: String
     let keyPath: PartialKeyPath<Root> //WritableKeyPath<Root, Value>
@@ -160,15 +160,19 @@ public struct EditValueView<Root, Value: Equatable>: View {
 enum Enum: CaseIterable {
     case red, yellow, blue
 }
-enum Enum2: Int, CaseIterable {
+enum Enum2: Int, CaseIterable, DefaultRepresentable {
     case red, yellow, blue
+    
+    static var defaultValue: Self {
+        .red
+    }
 }
 struct Item {
     var name: String
     var bool: Bool
     var date: Date
     var `enum`: Enum
-    var enum2: Enum2
+    var enum2: Enum2?
     var color: Color
     var `codable`: ACodable = .init(text: "", number: 5)
     var array = ["AA", "BB"]
@@ -178,7 +182,7 @@ struct Item {
     ]
 }
 
-struct ACodable: Hashable, Codable {
+struct ACodable: Codable {
     var text: String
     var number: Int
     var double: Double = 0.4
@@ -186,7 +190,7 @@ struct ACodable: Hashable, Codable {
     var nested: BCodable = .init(text: "", number: 0)
 }
 
-struct BCodable: Hashable, Codable {
+struct BCodable: Codable {
     var text: String
     var number: Int
     var optionalString: String? = nil
