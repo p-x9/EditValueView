@@ -8,19 +8,34 @@
 
 import SwiftUI
 
-struct CaseIterableEditor<Value: Hashable>: View {
+struct CaseIterableEditor<Value: Equatable>: View {
     
     let key: String
     @Binding private var value: Value
+    @State private var index: Int = 0
+    
+    private let allCases: [Value]
     
     init(_ value: Binding<Value>, key: String) {
-        _value = value
+        self._value = value
         self.key = key
+        
+        let type = Value.self as! any CaseIterable.Type
+        self.allCases = type.allCases as! Array<Value>
+        
+        self._index = .init(wrappedValue: allCases.firstIndex(of: value.wrappedValue) ?? 0)
     }
     
     var body: some View {
         VStack {
-            editor
+            if allCases.isEmpty {
+                Text("this type is currently not supported.")
+            } else {
+                editor
+            }
+        }
+        .onChange(of: index) { newValue in
+            value = allCases[newValue]
         }
     }
     
@@ -29,10 +44,10 @@ struct CaseIterableEditor<Value: Hashable>: View {
         switch Value.self {
         case let type as any (CaseIterable & RawRepresentable).Type:
             let allCases = type.allCases as! Array<Value>
-            Picker(key, selection: $value) {
-                ForEach(allCases, id: \.hashValue) {
-                    let rawValue = ($0 as! (any RawRepresentable)).rawValue
-                    let text = "\($0) (\(rawValue))"
+            Picker(key, selection: $index) {
+                ForEach(0..<allCases.count, id: \.self) {
+                    let rawValue = (allCases[$0] as! (any RawRepresentable)).rawValue
+                    let text = "\(allCases[$0]) (\(rawValue))"
                     Text(text).tag($0)
                 }
             }
@@ -40,9 +55,9 @@ struct CaseIterableEditor<Value: Hashable>: View {
             
         case let type as any CaseIterable.Type:
             let allCases = type.allCases as! Array<Value>
-            Picker(key, selection: $value) {
-                ForEach(allCases, id: \.hashValue) {
-                    let text = "\($0)"
+            Picker(key, selection: $index) {
+                ForEach(0..<allCases.count, id: \.self) {
+                    let text = "\(allCases[$0])"
                     Text(text).tag($0)
                 }
             }

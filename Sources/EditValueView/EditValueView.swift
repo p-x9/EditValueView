@@ -9,7 +9,7 @@ import SwiftUI
 //import SwiftUIColor
 
 @available(iOS 14, *)
-public struct EditValueView<Root, Value: Hashable>: View {
+public struct EditValueView<Root, Value: Equatable>: View {
     let target: Root
     let key: String
     let keyPath: PartialKeyPath<Root> //WritableKeyPath<Root, Value>
