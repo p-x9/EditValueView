@@ -17,6 +17,8 @@ public struct EditValueView<Root, Value>: View {
     private var isWrappedOptional = false
     
     @State private var value: Value
+    @State private var isValid = true
+    
     @Environment(\.presentationMode) private var presentationMode
     
     @_disfavoredOverload
@@ -63,6 +65,7 @@ public struct EditValueView<Root, Value>: View {
                                 save()
                                 presentationMode.wrappedValue.dismiss()
                             }
+                            .disabled(!isValid)
                         }
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
@@ -123,7 +126,7 @@ public struct EditValueView<Root, Value>: View {
                 .border(.black, width: 0.5)
             
         case _ where (value as? NSNumber) != nil:
-            CodableEditorView($value, key: key, textStyle: .single)
+            CodableEditorView($value, key: key, isValid: $isValid, textStyle: .single)
             
         case let v as Binding<Date>:
             DateEditorView(v, key: key)
@@ -138,7 +141,7 @@ public struct EditValueView<Root, Value>: View {
                 .border(.black, width: 0.5)
             
         case _ where Value.self is any Codable.Type:
-            CodableEditorView($value, key: key)
+            CodableEditorView($value, key: key, isValid: $isValid)
             
         default:
             Text("this type is currently not supported.")
