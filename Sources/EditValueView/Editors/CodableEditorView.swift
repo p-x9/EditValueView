@@ -19,14 +19,14 @@ struct CodableEditorView<Value>: View {
     let key: String
 
     @Binding private var value: Value
-    @Binding private var isValid: Bool
+    @Binding private var isValidType: Bool
 
     @State private var text: String
     @State private var textStyle: TextStyle
 
-    init(_ value: Binding<Value>, key: String, isValid: Binding<Bool>, textStyle: TextStyle = .multiline) {
+    init(_ value: Binding<Value>, key: String, isValidType: Binding<Bool>, textStyle: TextStyle = .multiline) {
         self._value = value
-        self._isValid = isValid
+        self._isValidType = isValidType
         self.key = key
         
         self._textStyle = .init(initialValue: textStyle)
@@ -80,11 +80,11 @@ struct CodableEditorView<Value>: View {
     func textChanged(text: String) {
         let type = Value.self as! Codable.Type
         guard let value = type.value(from: text) as? Value else {
-            isValid = false
+            isValidType = false
             return
         }
         self.value = value
-        isValid = true
+        isValidType = true
     }
     
     func typeDescription() -> String {

@@ -14,10 +14,15 @@ public struct EditValueView<Root, Value>: View {
     let key: String
     let keyPath: PartialKeyPath<Root> //WritableKeyPath<Root, Value>
     private var _onUpdate: ((Root, Value) -> Void)?
+    private var _validate: ((Root, Value) -> Bool)?
     private var isWrappedOptional = false
     
     @State private var value: Value
-    @State private var isValid = true
+    @State private var isValidType = true
+    
+    var isValid: Bool {
+        isValidType && (_validate?(target, value) ?? true)
+    }
     
     @Environment(\.presentationMode) private var presentationMode
     
@@ -60,7 +65,7 @@ public struct EditValueView<Root, Value>: View {
                     .frame(minHeight: proxy.size.height)
                     .navigationTitle(key)
                     .toolbar {
-                        ToolbarItemGroup(placement: .destructiveAction) {
+                        ToolbarItem(placement: .destructiveAction) {
                             Button("Save") {
                                 save()
                                 presentationMode.wrappedValue.dismiss()
@@ -126,7 +131,7 @@ public struct EditValueView<Root, Value>: View {
                 .border(.black, width: 0.5)
             
         case _ where (value as? NSNumber) != nil:
-            CodableEditorView($value, key: key, isValid: $isValid, textStyle: .single)
+            CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
             
         case let v as Binding<Date>:
             DateEditorView(v, key: key)
@@ -141,7 +146,7 @@ public struct EditValueView<Root, Value>: View {
                 .border(.black, width: 0.5)
             
         case _ where Value.self is any Codable.Type:
-            CodableEditorView($value, key: key, isValid: $isValid)
+            CodableEditorView($value, key: key, isValidType: $isValidType)
             
         default:
             Text("this type is currently not supported.")
@@ -151,6 +156,12 @@ public struct EditValueView<Root, Value>: View {
     public func onUpdate(_ onUpdate: ((Root, Value) -> Void)?) -> Self {
         var new = self
         new._onUpdate = onUpdate
+        return new
+    }
+    
+    public func validate(_ validate: ((Root, Value) -> Bool)?) -> Self {
+        var new = self
+        new._validate = validate
         return new
     }
     
@@ -211,6 +222,9 @@ struct EditValueView_Preview: PreviewProvider {
         Group {
             Group {
                 EditValueView(target, key: "name", keyPath: \Item.name)
+                    .validate { target, value in
+                        value != "Test"
+                    }
                     .previewDisplayName("String")
                 
                 EditValueView(target, key: "bool", keyPath: \Item.bool)
