@@ -26,9 +26,51 @@ Library that makes easy to display property edit screens for SwiftUI.
 
 
 ## Usage
+### SwiftUI
 ```swift
 EditValueView(target, key: "name", keyPath: \Item.name)
     .onUpdate { target, newValue in
         // update
+    }
+    .validate { target, newValue -> Bool in
+        // input validation
     } 
+```
+
+### UIKit
+```swift
+let vc = EditValueViewController(target, key: "name", keyPath: \Item.name)
+vc.onUpdate = { target, newValue in
+    // update
+}
+vc.validate = { target, newValue -> Bool in
+    // input validation
+}
+```
+
+### Protocol
+If you use a keypath of an optional type, either define a default value according to the `DefaultRepresentable` protocol or give the default value in the initilalize
+
+```swift
+struct Item: Codable {
+    var name: String
+    var date: Date
+}
+
+struct Message: Codable {
+    var content: String
+    var item: Item?
+}
+```
+```swift
+// Confirm to `DefaultRepresentable` protocol
+extension Item: DefaultRepresentable {
+    static var defaultValue: Self { 
+        .init(name: "name", date: Date())
+     }
+}
+```
+```swift
+// give default value
+EditValueView(target, key: "item", keyPath: \Message.item, defaultValue: .init(name: "name", date: Date()))
 ```
