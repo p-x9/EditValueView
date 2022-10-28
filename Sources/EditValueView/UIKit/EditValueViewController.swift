@@ -17,6 +17,7 @@ public class EditValueViewController<Root, Value>: UIViewController {
     let keyPath: PartialKeyPath<Root> // WritableKeyPath<Root, Value>
     
     public var onUpdate: ((Root, Value) -> Void)?
+    public var validate: ((Root, Value) -> Bool)?
     
     private var isWrappedOptional = false
     
@@ -62,9 +63,12 @@ public class EditValueViewController<Root, Value>: UIViewController {
     
     private func setupChildViewController() {
         editValueView = editValueView
-            .onUpdate({ [weak self] target, value in
+            .onUpdate { [weak self] target, value in
                 self?.onUpdate?(target, value)
-            })
+            }
+            .validate { [weak self] target, value in
+                self?.validate?(target, value) ?? true
+            }
         
         
         let vc = UIHostingController(rootView: editValueView)
