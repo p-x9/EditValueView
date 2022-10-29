@@ -61,7 +61,7 @@ struct ColorEditorView<Value>: View {
             value = cgColor as! Value
 
         default:
-            print("")
+            break
         }
     }
 
