@@ -6,7 +6,7 @@
 //
 //
 import SwiftUI
-//import SwiftUIColor
+import SwiftUIColor
 
 @available(iOS 14, *)
 public struct EditValueView<Root, Value>: View {
@@ -137,9 +137,16 @@ public struct EditValueView<Root, Value>: View {
             DateEditorView(v, key: key)
             
         case let v as Binding<Color>:
-            ColorPicker(key, selection: v)
-                .padding()
-                .border(.black, width: 0.5)
+            ColorEditorView(v, key: key)
+
+        case let v as Binding<CGColor>:
+            ColorEditorView(v, key: key)
+
+        case let v as Binding<NSUIColor>:
+            ColorEditorView(v, key: key)
+
+        case let v as Binding<CIColor>:
+            ColorEditorView(v, key: key)
             
         case _ where Value.self is any CaseIterable.Type:
             CaseIterableEditor($value, key: key)
@@ -194,6 +201,9 @@ struct Item {
         "AA": 0,
         "BB": 234
     ]
+    var cgColor = NSUIColor.yellow.cgColor
+    var uiColor = NSUIColor.blue
+    var ciColor = CIColor(color: NSUIColor.brown)
 }
 
 struct ACodable: Codable {
@@ -233,9 +243,6 @@ struct EditValueView_Preview: PreviewProvider {
                 EditValueView(target, key: "date", keyPath: \Item.date)
                     .previewDisplayName("Date")
                 
-                EditValueView(target, key: "color", keyPath: \Item.color)
-                    .previewDisplayName("Color")
-                
                 EditValueView(target, key: "number", keyPath: \Item.codable.number)
                     .previewDisplayName("Int")
                 
@@ -255,6 +262,20 @@ struct EditValueView_Preview: PreviewProvider {
                 
                 EditValueView(target, key: "dictionary", keyPath: \Item.dictionary)
                     .previewDisplayName("Dictionary")
+            }
+
+            Group {
+                EditValueView(target, key: "color", keyPath: \Item.color)
+                    .previewDisplayName("Color")
+
+                EditValueView(target, key: "ui/nsColor", keyPath: \Item.uiColor)
+                    .previewDisplayName("UI/NSColor")
+
+                EditValueView(target, key: "cgColor", keyPath: \Item.cgColor)
+                    .previewDisplayName("CGColor")
+
+                EditValueView(target, key: "ciColor", keyPath: \Item.ciColor)
+                    .previewDisplayName("CIColor")
             }
 
             EditValueView(target, key: "codable", keyPath: \Item.codable)

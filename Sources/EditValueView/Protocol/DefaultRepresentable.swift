@@ -6,6 +6,7 @@
 //
 //
 import Foundation
+import CoreGraphics
 
 public protocol DefaultRepresentable {
     static var defaultValue: Self { get }
@@ -91,5 +92,28 @@ extension CGPoint: DefaultRepresentable {
 extension CGRect: DefaultRepresentable {
     public static var defaultValue: CGRect {
         .init(origin: .defaultValue, size: .defaultValue)
+    }
+}
+
+
+extension CGColor: DefaultRepresentable {
+    public static var defaultValue: Self {
+        .init(red: 0, green: 0, blue: 0, alpha: 1)
+    }
+}
+
+#if canImport(CoreImage)
+import CoreImage
+extension CIColor: DefaultRepresentable {
+    public static var defaultValue: Self {
+        .init()
+    }
+}
+#endif
+
+
+extension NSUIColor: DefaultRepresentable {
+    public static var defaultValue: Self {
+        .init()
     }
 }
