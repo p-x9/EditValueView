@@ -15,7 +15,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/p-x9/SwiftUIColor.git", .upToNextMajor(from: "0.2.0"))
+        .package(url: "https://github.com/p-x9/SwiftUIColor.git", .upToNextMajor(from: "0.3.0"))
     ],
     targets: [
         .target(
