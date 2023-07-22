@@ -10,43 +10,20 @@ import SwiftUIColor
 
 @available(iOS 14, *)
 public struct EditValueView<Root, Value>: View {
-    let target: Root
+
     let key: String
-    let keyPath: PartialKeyPath<Root> //WritableKeyPath<Root, Value>
-    private var _onUpdate: ((Root, Value) -> Void)?
-    private var _validate: ((Root, Value) -> Bool)?
+    private var _onUpdate: ((Value) -> Void)?
+    private var _validate: ((Value) -> Bool)?
     private var isWrappedOptional = false
     
     @State private var value: Value
     @State private var isValidType = true
     
     var isValid: Bool {
-        isValidType && (_validate?(target, value) ?? true)
+        isValidType && (_validate?(value) ?? true)
     }
     
     @Environment(\.presentationMode) private var presentationMode
-    
-    @_disfavoredOverload
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
-        self.target = target
-        self.key = key
-        self.keyPath = keyPath
-        
-        self._value = .init(initialValue: target[keyPath: keyPath])
-    }
-    
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
-        self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
-    }
-    
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
-        self.target = target
-        self.key = key
-        self.keyPath = keyPath
-        self.isWrappedOptional = true
-        
-        self._value = .init(initialValue: target[keyPath: keyPath] ?? defaultValue)
-    }
     
     public var body: some View {
         NavigationView {
@@ -160,20 +137,40 @@ public struct EditValueView<Root, Value>: View {
         }
     }
     
-    public func onUpdate(_ onUpdate: ((Root, Value) -> Void)?) -> Self {
+    public func onUpdate(_ onUpdate: ((Value) -> Void)?) -> Self {
         var new = self
         new._onUpdate = onUpdate
         return new
     }
     
-    public func validate(_ validate: ((Root, Value) -> Bool)?) -> Self {
+    public func validate(_ validate: ((Value) -> Bool)?) -> Self {
         var new = self
         new._validate = validate
         return new
     }
     
     private func save() {
-        _onUpdate?(target, value)
+        _onUpdate?(value)
+    }
+}
+
+extension EditValueView {
+    @_disfavoredOverload
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+        self.key = key
+
+        self._value = .init(initialValue: target[keyPath: keyPath])
+    }
+
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
+        self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
+    }
+
+    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
+        self.key = key
+        self.isWrappedOptional = true
+
+        self._value = .init(initialValue: target[keyPath: keyPath] ?? defaultValue)
     }
 }
 
@@ -232,7 +229,7 @@ struct EditValueView_Preview: PreviewProvider {
         Group {
             Group {
                 EditValueView(target, key: "name", keyPath: \Item.name)
-                    .validate { target, value in
+                    .validate { value in
                         value != "Test"
                     }
                     .previewDisplayName("String")
@@ -277,7 +274,7 @@ struct EditValueView_Preview: PreviewProvider {
                 EditValueView(target, key: "ciColor", keyPath: \Item.ciColor)
                     .previewDisplayName("CIColor")
             }
-
+            
             EditValueView(target, key: "codable", keyPath: \Item.codable)
                 .previewDisplayName("Codable")
 

@@ -11,13 +11,11 @@ import UIKit
 import SwiftUI
 
 public class EditValueViewController<Root, Value>: UIViewController {
-    
-    let target: Root
+
     let key: String
-    let keyPath: PartialKeyPath<Root> // WritableKeyPath<Root, Value>
     
-    public var onUpdate: ((Root, Value) -> Void)?
-    public var validate: ((Root, Value) -> Bool)?
+    public var onUpdate: ((Value) -> Void)?
+    public var validate: ((Value) -> Bool)?
     
     private var isWrappedOptional = false
     
@@ -25,9 +23,7 @@ public class EditValueViewController<Root, Value>: UIViewController {
 
     @_disfavoredOverload
     public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
-        self.target = target
         self.key = key
-        self.keyPath = keyPath
         
         self.editValueView = .init(target, key: key, keyPath: keyPath)
         
@@ -35,9 +31,7 @@ public class EditValueViewController<Root, Value>: UIViewController {
     }
     
     public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
-        self.target = target
         self.key = key
-        self.keyPath = keyPath
         self.isWrappedOptional = true
         
         self.editValueView = .init(target, key: key, keyPath: keyPath, defaultValue: defaultValue)
@@ -63,11 +57,11 @@ public class EditValueViewController<Root, Value>: UIViewController {
     
     private func setupChildViewController() {
         editValueView = editValueView
-            .onUpdate { [weak self] target, value in
-                self?.onUpdate?(target, value)
+            .onUpdate { [weak self] value in
+                self?.onUpdate?(value)
             }
-            .validate { [weak self] target, value in
-                self?.validate?(target, value) ?? true
+            .validate { [weak self] value in
+                self?.validate?(value) ?? true
             }
         
         
