@@ -27,6 +27,14 @@ public class EditValueViewController<Value>: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    public init(key: String, value: Value) {
+        self.key = key
+
+        self.editValueView = .init(key: key, value: value)
+
+        super.init(nibName: nil, bundle: nil)
+    }
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
