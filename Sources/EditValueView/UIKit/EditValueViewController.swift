@@ -10,16 +10,16 @@
 import UIKit
 import SwiftUI
 
-public class EditValueViewController<Root, Value>: UIViewController {
+public class EditValueViewController<Value>: UIViewController {
 
     let key: String
 
     public var onUpdate: ((Value) -> Void)?
     public var validate: ((Value) -> Bool)?
 
-    private var editValueView: EditValueView<Root, Value>
+    private var editValueView: EditValueView<Value>
 
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
 
         self.editValueView = .init(target, key: key, keyPath: keyPath)

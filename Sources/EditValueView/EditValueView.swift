@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftUIColor
 
 @available(iOS 14, *)
-public struct EditValueView<Root, Value>: View {
+public struct EditValueView<Value>: View {
 
     let key: String
     private var _onUpdate: ((Value) -> Void)?
@@ -193,7 +193,7 @@ public struct EditValueView<Root, Value>: View {
 }
 
 extension EditValueView {
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
         self._value = .init(initialValue: target[keyPath: keyPath])
     }
