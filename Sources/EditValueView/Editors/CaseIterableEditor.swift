@@ -72,15 +72,18 @@ struct CaseIterableEditor<Value>: View {
         case let type as any OptionalCaseIterable.Type:
             let allCases = type.optionalAllCases.compactMap { $0 }
             Picker(key, selection: $index) {
-                ForEach(0..<allCases.count, id: \.self) {
-                    let `case` = allCases[$0]
-
-                    if let raw = (`case` as? (any RawRepresentable))?.rawValue {
-                        let text = "\(`case`) (\(raw))"
-                        Text(text).tag($0)
+                ForEach(0..<allCases.count + 1, id: \.self) {
+                    if $0 == allCases.count {
+                        Text("Optional.nil").tag($0)
                     } else {
-                        let text = "\(`case`)"
-                        Text(text).tag($0)
+                        let `case` = allCases[$0]
+                        if let raw = (`case` as? (any RawRepresentable))?.rawValue {
+                            let text = "\(`case`) (\(raw))"
+                            Text(text).tag($0)
+                        } else {
+                            let text = "\(`case`)"
+                            Text(text).tag($0)
+                        }
                     }
                 }
             }

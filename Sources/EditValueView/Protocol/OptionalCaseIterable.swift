@@ -18,7 +18,7 @@ public protocol OptionalCaseIterable: OptionalType where Wrapped: CaseIterable {
 
 extension OptionalCaseIterable {
     public static var optionalAllCases: [Wrapped?] {
-        Array(Wrapped.allCases.map { .some($0) })
+        Array(Wrapped.allCases.map { .some($0) }) + [.none]
     }
 }
 

@@ -110,6 +110,15 @@ extension CIColor: DefaultRepresentable {
 }
 #endif
 
+#if canImport(SwiftUI)
+import SwiftUI
+extension Color: DefaultRepresentable {
+    public static var defaultValue: Self {
+        .black
+    }
+}
+#endif
+
 extension NSUIColor: DefaultRepresentable {
     public static var defaultValue: Self {
         .init()

@@ -17,7 +17,8 @@ public struct EditValueView<Value>: View {
 
     private var setValue: ((Value) -> Void)?
 
-    @State private var value: Value
+    @State var value: Value
+    @State private var shouldSetNil = false
     @State private var isValidType = true
 
     var isValid: Bool {
@@ -28,36 +29,57 @@ public struct EditValueView<Value>: View {
         Value.self is any OptionalType.Type
     }
 
+    var isNil: Bool {
+        if let optional = value as? any OptionalType {
+            return optional.wrapped == nil
+        }
+        return false
+    }
+
+    var shouldShowOptionalEditor: Bool {
+        isOptional &&
+        editorType.shouldShowOptionalEditor
+    }
+
     @Environment(\.presentationMode) private var presentationMode
 
     public var body: some View {
         NavigationView {
-            GeometryReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 8) {
-                        header
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    header
 
-                        typeSection
+                    typeSection
+                        .padding(.top)
 
+                    if isOptional && shouldShowOptionalEditor {
+                        optionalEditor
+                            .padding()
+                            .border(.black, width: 0.5)
+                            .padding(.vertical)
+                    }
+
+                    if !shouldSetNil && !isNil || !shouldShowOptionalEditor {
                         editor
                             .padding(.vertical)
-                        Spacer()
+                            .layoutPriority(.infinity)
                     }
-                    .padding()
-                    .frame(minHeight: proxy.size.height)
-                    .navigationTitle(key)
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button("Save") {
-                                save()
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                            .disabled(!isValid)
+
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle(key)
+                .toolbar {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("Save") {
+                            save()
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") {
-                                presentationMode.wrappedValue.dismiss()
-                            }
+                        .disabled(!isValid)
+                    }
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            presentationMode.wrappedValue.dismiss()
                         }
                     }
                 }
@@ -80,7 +102,6 @@ public struct EditValueView<Value>: View {
                 Text(string)
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .foregroundColor(.gray)
-                    .padding([.bottom])
                 Spacer()
             }
         }
@@ -101,10 +122,30 @@ public struct EditValueView<Value>: View {
     }
 
     @ViewBuilder
+    var optionalEditor: some View {
+        Toggle(isOn: $shouldSetNil) {
+            Text("Set value to `nil`")
+        }
+        .onChange(of: shouldSetNil) { newValue in
+            if newValue {
+                setNil()
+            } else {
+                setDefault()
+            }
+        }
+    }
+
+    @ViewBuilder
+    var notSupportedView: some View {
+        Text("this type is currently not supported.")
+    }
+
+    @ViewBuilder
     var editor: some View {
         switch $value {
         case let v as Binding<String>:
             TextEditor(text: v)
+                .frame(minHeight: 200, maxHeight: .infinity)
                 .border(.black, width: 0.5)
 
         case let v as Binding<Bool>:
@@ -112,7 +153,7 @@ public struct EditValueView<Value>: View {
                 .padding()
                 .border(.black, width: 0.5)
 
-        case _ where (value as? NSNumber) != nil && !isOptional:
+        case _ where Value.self is any Numeric.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
 
         case let v as Binding<Date>:
@@ -134,44 +175,45 @@ public struct EditValueView<Value>: View {
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-            /* Optional Type */
-        case let v as Binding<String?>:
+        /* Optional Type */
+        case let v as Binding<String?> where !isNil:
             TextEditor(text: Binding(v)!)
+                .frame(minHeight: 200, maxHeight: .infinity)
                 .border(.black, width: 0.5)
 
-        case let v as Binding<Bool?>:
+        case let v as Binding<Bool?> where !isNil:
             Toggle(key, isOn: Binding(v)!)
                 .padding()
                 .border(.black, width: 0.5)
 
-        case _ where (value as? NSNumber) != nil && isOptional:
+        case _ where Value.self is any OptionalNumeric.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
 
-        case let v as Binding<Date?>:
+        case let v as Binding<Date?> where !isNil:
             DateEditorView(Binding(v)!, key: key)
 
-        case let v as Binding<Color?>:
+        case let v as Binding<Color?> where !isNil:
             ColorEditorView(Binding(v)!, key: key)
 
-        case let v as Binding<CGColor?>:
+        case let v as Binding<CGColor?> where !isNil:
             ColorEditorView(Binding(v)!, key: key)
 
-        case let v as Binding<NSUIColor?>:
+        case let v as Binding<NSUIColor?> where !isNil:
             ColorEditorView(Binding(v)!, key: key)
 
-        case let v as Binding<CIColor?>:
+        case let v as Binding<CIColor?> where !isNil:
             ColorEditorView(Binding(v)!, key: key)
 
         case _ where Value.self is any OptionalCaseIterable.Type:
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-            /* Other */
+        /* Other */
         case _ where Value.self is any Codable.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType)
 
         default:
-            Text("this type is currently not supported.")
+            notSupportedView
         }
     }
 
@@ -234,6 +276,10 @@ struct ACodable: Codable {
     var double: Double = 0.4
     var optionalString: String? = "test"
     var nested: BCodable = .init(text: "", number: 0)
+}
+
+extension ACodable: DefaultRepresentable {
+    static var defaultValue: ACodable = .init(text: "", number: 0)
 }
 
 struct BCodable: Codable {

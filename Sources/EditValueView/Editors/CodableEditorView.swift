@@ -71,6 +71,7 @@ struct CodableEditorView<Value>: View {
 
         case .multiline:
             TextEditor(text: $text)
+                .frame(minHeight: 200, maxHeight: .infinity)
                 .border(.black, width: 0.5)
                 .padding(.vertical)
         }
