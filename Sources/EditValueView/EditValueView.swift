@@ -11,26 +11,43 @@ import SwiftUIColor
 @available(iOS 14, *)
 public struct EditValueView<Value>: View {
 
+    /// Name of the property to be edited
+    /// Used for navigation titles and type descriptions.
     let key: String
+
+    /// This is called when editing is completed by pressing the save button.
+    /// They will be received by a modifier named `onUpdate`.
     private var _onUpdate: ((Value) -> Void)?
+
+    /// Used to perform validation checks when editing values
+    /// They will be received by a modifier named `validate`.
     private var _validate: ((Value) -> Bool)?
 
-    private var setValue: ((Value) -> Void)?
-
+    /// Value to be edited
     @State var value: Value
+
+    /// True if nil set is requested by optionalEditor.
+    /// Note: Use the `isNil` property to check if a value is actually nil.
     @State private var shouldSetNil = false
+
+    /// A boolean value indicating whether the current input value can be converted to the actual type.
     @State private var isValidType = true
 
+    /// binding received from the initializer.
+    /// When the save button is pressed, the binding is updated to indicate the value change.
     private var binding: Binding<Value>?
 
+    /// A boolean value that indicates whether the current input value can be converted to the actual type and conforms to the validation checks
     var isValid: Bool {
         isValidType && (_validate?(value) ?? true)
     }
 
+    /// A boolean value that indicates whether the type being edited is an Optional type or not
     var isOptional: Bool {
         Value.self is any OptionalType.Type
     }
 
+    /// A boolean value that indicates whether the value is nil
     var isNil: Bool {
         if let optional = value as? any OptionalType {
             return optional.wrapped == nil
@@ -38,6 +55,7 @@ public struct EditValueView<Value>: View {
         return false
     }
 
+    /// A boolean value that indicates whether optionalEditor should be displayed
     var shouldShowOptionalEditor: Bool {
         isOptional &&
         editorType.shouldShowOptionalEditor
@@ -89,6 +107,7 @@ public struct EditValueView<Value>: View {
         }
     }
 
+    /// Displays key and type information
     @ViewBuilder
     var header: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -109,6 +128,7 @@ public struct EditValueView<Value>: View {
         }
     }
 
+    /// Displays type infotmation
     @ViewBuilder
     var typeSection: some View {
         HStack {
@@ -219,12 +239,19 @@ public struct EditValueView<Value>: View {
         }
     }
 
+    /// Set the process to be performed when the Save button is pressed.
+    /// - Parameter onUpdate: A closure that receives the edited value
+    /// - Returns: Self
     public func onUpdate(_ onUpdate: ((Value) -> Void)?) -> Self {
         var new = self
         new._onUpdate = onUpdate
         return new
     }
 
+    /// Set validation checks.
+    /// Returning false disables the save button
+    /// - Parameter validate: A closure that takes the current value after editing and returns the validation result
+    /// - Returns: Self
     public func validate(_ validate: ((Value) -> Bool)?) -> Self {
         var new = self
         new._validate = validate
@@ -238,15 +265,28 @@ public struct EditValueView<Value>: View {
 }
 
 extension EditValueView {
+    /// Initialize with key and value
+    /// - Parameters:
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - value: Initial value of the value to be edited
     public init(key: String, value: Value) {
         self.key = key
         self._value = .init(initialValue: value)
     }
 
+    /// initialize with keyPath
+    /// - Parameters:
+    ///   - target: Target object that has the property to be edited.
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - keyPath: keyPath of the property to be edited.
     public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.init(key: key, value: target[keyPath: keyPath])
     }
 
+    /// Initialize with binding
+    /// - Parameters:
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - binding: Binder for the value to be edited
     public init(key: String, binding: Binding<Value>) {
         self.key = key
         self._value = .init(initialValue: binding.wrappedValue)
