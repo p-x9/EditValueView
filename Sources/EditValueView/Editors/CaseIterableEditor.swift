@@ -19,9 +19,15 @@ struct CaseIterableEditor<Value>: View {
     init(_ value: Binding<Value>, key: String) {
         self._value = value
         self.key = key
-        
-        let type = Value.self as! any CaseIterable.Type
-        self.allCases = type.allCases as! Array<Value>
+
+        switch Value.self {
+        case let type as any CaseIterable.Type:
+            self.allCases = type.allCases as! Array<Value>
+        case let type as any OptionalCaseIterable.Type:
+            self.allCases = type.optionalAllCases as! Array<Value>
+        default:
+            fatalError()
+        }
         
         self._index = .init(wrappedValue: allCases.firstIndex(where: { "\($0)" == "\(value.wrappedValue)" }) ?? 0)
     }
@@ -59,6 +65,23 @@ struct CaseIterableEditor<Value>: View {
                 ForEach(0..<allCases.count, id: \.self) {
                     let text = "\(allCases[$0])"
                     Text(text).tag($0)
+                }
+            }
+            .pickerStyle(.automatic)
+
+        case let type as any OptionalCaseIterable.Type:
+            let allCases = type.optionalAllCases.compactMap { $0 }
+            Picker(key, selection: $index) {
+                ForEach(0..<allCases.count, id: \.self) {
+                    let `case` = allCases[$0]
+
+                    if let raw = (`case` as? (any RawRepresentable))?.rawValue {
+                        let text = "\(`case`) (\(raw))"
+                        Text(text).tag($0)
+                    } else {
+                        let text = "\(`case`)"
+                        Text(text).tag($0)
+                    }
                 }
             }
             .pickerStyle(.automatic)

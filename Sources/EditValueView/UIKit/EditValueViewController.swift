@@ -17,30 +17,14 @@ public class EditValueViewController<Root, Value>: UIViewController {
     public var onUpdate: ((Value) -> Void)?
     public var validate: ((Value) -> Bool)?
     
-    private var isWrappedOptional = false
-    
     private var editValueView: EditValueView<Root, Value>
 
-    @_disfavoredOverload
     public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
         
         self.editValueView = .init(target, key: key, keyPath: keyPath)
         
         super.init(nibName: nil, bundle: nil)
-    }
-    
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
-        self.key = key
-        self.isWrappedOptional = true
-        
-        self.editValueView = .init(target, key: key, keyPath: keyPath, defaultValue: defaultValue)
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    public convenience init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
-        self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
     }
     
     

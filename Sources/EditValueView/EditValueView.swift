@@ -14,13 +14,18 @@ public struct EditValueView<Root, Value>: View {
     let key: String
     private var _onUpdate: ((Value) -> Void)?
     private var _validate: ((Value) -> Bool)?
-    private var isWrappedOptional = false
+
+    private var setValue: ((Value) -> Void)?
     
     @State private var value: Value
     @State private var isValidType = true
     
     var isValid: Bool {
         isValidType && (_validate?(value) ?? true)
+    }
+
+    var isOptional: Bool {
+        Value.self is any OptionalType.Type
     }
     
     @Environment(\.presentationMode) private var presentationMode
@@ -107,7 +112,7 @@ public struct EditValueView<Root, Value>: View {
                 .padding()
                 .border(.black, width: 0.5)
             
-        case _ where (value as? NSNumber) != nil:
+        case _ where (value as? NSNumber) != nil && !isOptional:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
             
         case let v as Binding<Date>:
@@ -128,7 +133,40 @@ public struct EditValueView<Root, Value>: View {
         case _ where Value.self is any CaseIterable.Type:
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
-            
+
+        /* Optional Type */
+        case let v as Binding<String?>:
+            TextEditor(text: Binding(v)!)
+                .border(.black, width: 0.5)
+
+        case let v as Binding<Bool?>:
+            Toggle(key, isOn: Binding(v)!)
+                .padding()
+                .border(.black, width: 0.5)
+
+        case _ where (value as? NSNumber) != nil && isOptional:
+            CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
+
+        case let v as Binding<Date?>:
+            DateEditorView(Binding(v)!, key: key)
+
+        case let v as Binding<Color?>:
+            ColorEditorView(Binding(v)!, key: key)
+
+        case let v as Binding<CGColor?>:
+            ColorEditorView(Binding(v)!, key: key)
+
+        case let v as Binding<NSUIColor?>:
+            ColorEditorView(Binding(v)!, key: key)
+
+        case let v as Binding<CIColor?>:
+            ColorEditorView(Binding(v)!, key: key)
+
+        case _ where Value.self is any OptionalCaseIterable.Type:
+            CaseIterableEditor($value, key: key)
+                .border(.black, width: 0.5)
+
+        /* Other */
         case _ where Value.self is any Codable.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType)
             
@@ -136,7 +174,7 @@ public struct EditValueView<Root, Value>: View {
             Text("this type is currently not supported.")
         }
     }
-    
+
     public func onUpdate(_ onUpdate: ((Value) -> Void)?) -> Self {
         var new = self
         new._onUpdate = onUpdate
@@ -155,22 +193,9 @@ public struct EditValueView<Root, Value>: View {
 }
 
 extension EditValueView {
-    @_disfavoredOverload
     public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
-
         self._value = .init(initialValue: target[keyPath: keyPath])
-    }
-
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
-        self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
-    }
-
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
-        self.key = key
-        self.isWrappedOptional = true
-
-        self._value = .init(initialValue: target[keyPath: keyPath] ?? defaultValue)
     }
 }
 
@@ -239,10 +264,10 @@ struct EditValueView_Preview: PreviewProvider {
                 
                 EditValueView(target, key: "date", keyPath: \Item.date)
                     .previewDisplayName("Date")
-                
+
                 EditValueView(target, key: "number", keyPath: \Item.codable.number)
                     .previewDisplayName("Int")
-                
+
                 EditValueView(target, key: "double", keyPath: \Item.codable.double)
                     .previewDisplayName("Double")
             }
