@@ -16,6 +16,13 @@ struct CaseIterableEditor<Value>: View {
 
     private let allCases: [Value]
 
+    var isNil: Bool {
+        if let optional = value as? any OptionalType {
+            return optional.wrapped == nil
+        }
+        return false
+    }
+
     init(_ value: Binding<Value>, key: String) {
         self._value = value
         self.key = key
@@ -88,6 +95,7 @@ struct CaseIterableEditor<Value>: View {
                 }
             }
             .pickerStyle(.automatic)
+            .accentColor(isNil ? .red : .accentColor)
 
         default:
             Text("this type is currently not supported.")
