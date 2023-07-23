@@ -15,4 +15,3 @@ typealias NSUIColor = UIColor
 import Cocoa
 typealias NSUIColor = NSColor
 #endif
-

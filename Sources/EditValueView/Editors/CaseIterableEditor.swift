@@ -9,29 +9,29 @@
 import SwiftUI
 
 struct CaseIterableEditor<Value>: View {
-    
+
     let key: String
     @Binding private var value: Value
     @State private var index: Int = 0
-    
+
     private let allCases: [Value]
-    
+
     init(_ value: Binding<Value>, key: String) {
         self._value = value
         self.key = key
 
         switch Value.self {
         case let type as any CaseIterable.Type:
-            self.allCases = type.allCases as! Array<Value>
+            self.allCases = type.allCases as! [Value]
         case let type as any OptionalCaseIterable.Type:
-            self.allCases = type.optionalAllCases as! Array<Value>
+            self.allCases = type.optionalAllCases as! [Value]
         default:
             fatalError()
         }
-        
+
         self._index = .init(wrappedValue: allCases.firstIndex(where: { "\($0)" == "\(value.wrappedValue)" }) ?? 0)
     }
-    
+
     var body: some View {
         VStack {
             if allCases.isEmpty {
@@ -44,12 +44,12 @@ struct CaseIterableEditor<Value>: View {
             value = allCases[newValue]
         }
     }
-    
+
     @ViewBuilder
     var editor: some View {
         switch Value.self {
         case let type as any (CaseIterable & RawRepresentable).Type:
-            let allCases = type.allCases as! Array<Value>
+            let allCases = type.allCases as! [Value]
             Picker(key, selection: $index) {
                 ForEach(0..<allCases.count, id: \.self) {
                     let rawValue = (allCases[$0] as! (any RawRepresentable)).rawValue
@@ -58,9 +58,9 @@ struct CaseIterableEditor<Value>: View {
                 }
             }
             .pickerStyle(.automatic)
-            
+
         case let type as any CaseIterable.Type:
-            let allCases = type.allCases as! Array<Value>
+            let allCases = type.allCases as! [Value]
             Picker(key, selection: $index) {
                 ForEach(0..<allCases.count, id: \.self) {
                     let text = "\(allCases[$0])"
@@ -85,7 +85,7 @@ struct CaseIterableEditor<Value>: View {
                 }
             }
             .pickerStyle(.automatic)
-            
+
         default:
             Text("this type is currently not supported.")
         }

@@ -14,8 +14,8 @@ extension Encodable {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         return encoder
     }
-    
-    var jsonString: String?  {
+
+    var jsonString: String? {
         guard let data = try? Self.jsonEncoder.encode(self) else {
             return nil
         }
@@ -28,7 +28,7 @@ extension Decodable {
         let decoder = JSONDecoder()
         return decoder
     }
-    
+
     static func value(from jsonString: String) -> Self? {
         guard let data = jsonString.data(using: .utf8) else {
             return nil

@@ -16,10 +16,10 @@ public struct EditValueView<Root, Value>: View {
     private var _validate: ((Value) -> Bool)?
 
     private var setValue: ((Value) -> Void)?
-    
+
     @State private var value: Value
     @State private var isValidType = true
-    
+
     var isValid: Bool {
         isValidType && (_validate?(value) ?? true)
     }
@@ -27,18 +27,18 @@ public struct EditValueView<Root, Value>: View {
     var isOptional: Bool {
         Value.self is any OptionalType.Type
     }
-    
+
     @Environment(\.presentationMode) private var presentationMode
-    
+
     public var body: some View {
         NavigationView {
-            GeometryReader{ proxy in
+            GeometryReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 8) {
                         header
-                        
+
                         typeSection
-                        
+
                         editor
                             .padding(.vertical)
                         Spacer()
@@ -64,7 +64,7 @@ public struct EditValueView<Root, Value>: View {
             }
         }
     }
-    
+
     @ViewBuilder
     var header: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -85,7 +85,7 @@ public struct EditValueView<Root, Value>: View {
             }
         }
     }
-    
+
     @ViewBuilder
     var typeSection: some View {
         HStack {
@@ -99,25 +99,25 @@ public struct EditValueView<Root, Value>: View {
         .background(Color.iOS.secondarySystemFill)
         .cornerRadius(8)
     }
-    
+
     @ViewBuilder
     var editor: some View {
         switch $value {
         case let v as Binding<String>:
             TextEditor(text: v)
                 .border(.black, width: 0.5)
-            
+
         case let v as Binding<Bool>:
             Toggle(key, isOn: v)
                 .padding()
                 .border(.black, width: 0.5)
-            
+
         case _ where (value as? NSNumber) != nil && !isOptional:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
-            
+
         case let v as Binding<Date>:
             DateEditorView(v, key: key)
-            
+
         case let v as Binding<Color>:
             ColorEditorView(v, key: key)
 
@@ -129,12 +129,12 @@ public struct EditValueView<Root, Value>: View {
 
         case let v as Binding<CIColor>:
             ColorEditorView(v, key: key)
-            
+
         case _ where Value.self is any CaseIterable.Type:
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-        /* Optional Type */
+            /* Optional Type */
         case let v as Binding<String?>:
             TextEditor(text: Binding(v)!)
                 .border(.black, width: 0.5)
@@ -166,10 +166,10 @@ public struct EditValueView<Root, Value>: View {
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-        /* Other */
+            /* Other */
         case _ where Value.self is any Codable.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType)
-            
+
         default:
             Text("this type is currently not supported.")
         }
@@ -180,13 +180,13 @@ public struct EditValueView<Root, Value>: View {
         new._onUpdate = onUpdate
         return new
     }
-    
+
     public func validate(_ validate: ((Value) -> Bool)?) -> Self {
         var new = self
         new._validate = validate
         return new
     }
-    
+
     private func save() {
         _onUpdate?(value)
     }
@@ -205,7 +205,7 @@ enum Enum: CaseIterable {
 }
 enum Enum2: Int, CaseIterable, DefaultRepresentable {
     case red, yellow, blue
-    
+
     static var defaultValue: Self {
         .red
     }
@@ -239,18 +239,18 @@ struct ACodable: Codable {
 struct BCodable: Codable {
     var text: String
     var number: Int
-    var optionalString: String? = nil
+    var optionalString: String?
 }
 
 struct EditValueView_Preview: PreviewProvider {
     static var previews: some View {
-        let target: Item =  .init(name: "Hello!!",
+        let target: Item = .init(name: "Hello!!",
                                   bool: true,
                                   date: Date(),
                                   enum: .red,
                                   enum2: .blue,
                                   color: .white)
-        
+
         Group {
             Group {
                 EditValueView(target, key: "name", keyPath: \Item.name)
@@ -258,10 +258,10 @@ struct EditValueView_Preview: PreviewProvider {
                         value != "Test"
                     }
                     .previewDisplayName("String")
-                
+
                 EditValueView(target, key: "bool", keyPath: \Item.bool)
                     .previewDisplayName("Bool")
-                
+
                 EditValueView(target, key: "date", keyPath: \Item.date)
                     .previewDisplayName("Date")
 
@@ -271,17 +271,17 @@ struct EditValueView_Preview: PreviewProvider {
                 EditValueView(target, key: "double", keyPath: \Item.codable.double)
                     .previewDisplayName("Double")
             }
-            
+
             Group {
                 EditValueView(target, key: "enum", keyPath: \Item.enum)
                     .previewDisplayName("Enum(CaseIterable)")
-                
+
                 EditValueView(target, key: "enum", keyPath: \Item.enum2)
                     .previewDisplayName("Enum(CaseIterable & RawRepresentable)")
-                
+
                 EditValueView(target, key: "array", keyPath: \Item.array)
                     .previewDisplayName("Array")
-                
+
                 EditValueView(target, key: "dictionary", keyPath: \Item.dictionary)
                     .previewDisplayName("Dictionary")
             }
@@ -299,7 +299,7 @@ struct EditValueView_Preview: PreviewProvider {
                 EditValueView(target, key: "ciColor", keyPath: \Item.ciColor)
                     .previewDisplayName("CIColor")
             }
-            
+
             EditValueView(target, key: "codable", keyPath: \Item.codable)
                 .previewDisplayName("Codable")
 

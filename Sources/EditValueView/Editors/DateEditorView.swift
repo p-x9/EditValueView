@@ -9,15 +9,15 @@
 import SwiftUI
 
 struct DateEditorView: View {
-    
+
     let key: String
     @Binding private var value: Date
-    
+
     init(_ value: Binding<Date>, key: String) {
         _value = value
         self.key = key
     }
-    
+
     var body: some View {
         VStack {
             Text(value.description)
