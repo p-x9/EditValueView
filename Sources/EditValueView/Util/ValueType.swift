@@ -123,16 +123,34 @@ extension ValueType {
             break
         }
 
+        if let optional = value as? (any OptionalType),
+           let wrapped = optional.wrapped {
+            let nestedMirror = Mirror(reflecting: wrapped)
+
+            if nestedMirror.displayStyle == .struct || nestedMirror.displayStyle == .class {
+                return .optional(extractClassOrStruct(with: nestedMirror))
+            }
+        }
+
         if mirror.displayStyle == .struct || mirror.displayStyle == .class {
             var description: [String: ValueType] = [:]
             for case let (label?, value) in mirror.children {
                 description[label] = extractType(for: value)
             }
-            return isOptional ?
-                .optional(.classOrStruct(description)) :
-                .classOrStruct(description)
+            return extractClassOrStruct(with: mirror)
         }
 
         return isOptional ? .optional(.unknown(type)) : .unknown(type)
+    }
+
+    private static func extractClassOrStruct(with mirror: Mirror) -> ValueType {
+        guard mirror.displayStyle == .class || mirror.displayStyle == .struct else {
+            fatalError()
+        }
+        var description: [String: ValueType] = [:]
+        for case let (label?, value) in mirror.children {
+            description[label] = extractType(for: value)
+        }
+        return .classOrStruct(description)
     }
 }

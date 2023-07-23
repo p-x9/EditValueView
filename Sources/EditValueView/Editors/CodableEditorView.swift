@@ -87,6 +87,11 @@ struct CodableEditorView<Value>: View {
     }
 
     func typeDescription() -> String {
-        ValueType.extractType(for: value).typeName
+        if let optional = value as? (any OptionalType),
+           optional.wrapped == nil,
+           let type = Value.self as? any DefaultRepresentable.Type {
+            return ValueType.extractType(for: Optional.some(type.defaultValue)).typeName
+        }
+        return ValueType.extractType(for: value).typeName
     }
 }

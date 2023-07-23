@@ -10,6 +10,8 @@ import Foundation
 
 public protocol OptionalType {
     associatedtype Wrapped
+
+    var wrapped: Wrapped? { get }
 }
 
 extension OptionalType {
@@ -18,4 +20,6 @@ extension OptionalType {
     }
 }
 
-extension Optional: OptionalType {}
+extension Optional: OptionalType {
+    public var wrapped: Wrapped? { self }
+}
