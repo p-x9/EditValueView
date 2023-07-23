@@ -12,13 +12,22 @@ import SwiftUI
 
 public class EditValueViewController<Value>: UIViewController {
 
+    /// Name of the property to be edited
+    /// Used for navigation titles and type descriptions.
     let key: String
 
+    /// This is called when editing is completed by pressing the save button.
     public var onUpdate: ((Value) -> Void)?
+
+    /// Used to perform validation checks when editing values
     public var validate: ((Value) -> Bool)?
 
     private var editValueView: EditValueView<Value>
 
+    /// Initialize with key and value
+    /// - Parameters:
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - value: Initial value of the value to be edited
     public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
 
@@ -27,6 +36,11 @@ public class EditValueViewController<Value>: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    /// initialize with keyPath
+    /// - Parameters:
+    ///   - target: Target object that has the property to be edited.
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - keyPath: keyPath of the property to be edited.
     public init(key: String, value: Value) {
         self.key = key
 
