@@ -126,7 +126,7 @@ extension NSUIColor: DefaultRepresentable {
 }
 
 extension Optional: DefaultRepresentable where Wrapped: DefaultRepresentable {
-    public static var defaultValue: Optional<Wrapped> {
+    public static var defaultValue: Self {
         Wrapped.defaultValue
     }
 }

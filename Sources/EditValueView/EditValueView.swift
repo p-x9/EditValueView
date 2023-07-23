@@ -21,6 +21,8 @@ public struct EditValueView<Value>: View {
     @State private var shouldSetNil = false
     @State private var isValidType = true
 
+    private var binding: Binding<Value>?
+
     var isValid: Bool {
         isValidType && (_validate?(value) ?? true)
     }
@@ -230,6 +232,7 @@ public struct EditValueView<Value>: View {
     }
 
     private func save() {
+        binding?.wrappedValue = value
         _onUpdate?(value)
     }
 }
@@ -242,6 +245,12 @@ extension EditValueView {
 
     public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.init(key: key, value: target[keyPath: keyPath])
+    }
+
+    public init(key: String, binding: Binding<Value>) {
+        self.key = key
+        self._value = .init(initialValue: binding.wrappedValue)
+        self.binding = binding
     }
 }
 
