@@ -235,9 +235,13 @@ public struct EditValueView<Value>: View {
 }
 
 extension EditValueView {
-    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+    public init(key: String, value: Value) {
         self.key = key
-        self._value = .init(initialValue: target[keyPath: keyPath])
+        self._value = .init(initialValue: value)
+    }
+
+    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+        self.init(key: key, value: target[keyPath: keyPath])
     }
 }
 
