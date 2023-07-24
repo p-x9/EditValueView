@@ -274,7 +274,7 @@ extension EditValueView {
         self._value = .init(initialValue: value)
     }
 
-    /// initialize with keyPath
+    /// Initialize with keyPath
     /// - Parameters:
     ///   - target: Target object that has the property to be edited.
     ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
