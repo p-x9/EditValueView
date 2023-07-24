@@ -65,41 +65,44 @@ public struct EditValueView<Value>: View {
 
     public var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
-                    header
+            GeometryReader{ proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        header
 
-                    typeSection
-                        .padding(.top)
+                        typeSection
+                            .padding(.top)
 
-                    if isOptional && shouldShowOptionalEditor {
-                        optionalEditor
-                            .padding()
-                            .border(.black, width: 0.5)
-                            .padding(.vertical)
-                    }
-
-                    if !shouldSetNil && !isNil || !shouldShowOptionalEditor {
-                        editor
-                            .padding(.vertical)
-                            .layoutPriority(.infinity)
-                    }
-
-                    Spacer()
-                }
-                .padding()
-                .navigationTitle(key)
-                .toolbar {
-                    ToolbarItem(placement: .destructiveAction) {
-                        Button("Save") {
-                            save()
-                            presentationMode.wrappedValue.dismiss()
+                        if isOptional && shouldShowOptionalEditor {
+                            optionalEditor
+                                .padding()
+                                .border(.black, width: 0.5)
+                                .padding(.vertical)
                         }
-                        .disabled(!isValid)
+
+                        if !shouldSetNil && !isNil || !shouldShowOptionalEditor {
+                            editor
+                                .padding(.vertical)
+                                .layoutPriority(.infinity)
+                        }
+
+                        Spacer()
                     }
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            presentationMode.wrappedValue.dismiss()
+                    .padding()
+                    .frame(minHeight: proxy.size.height)
+                    .navigationTitle(key)
+                    .toolbar {
+                        ToolbarItem(placement: .destructiveAction) {
+                            Button("Save") {
+                                save()
+                                presentationMode.wrappedValue.dismiss()
+                            }
+                            .disabled(!isValid)
+                        }
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                presentationMode.wrappedValue.dismiss()
+                            }
                         }
                     }
                 }

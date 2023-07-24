@@ -39,6 +39,7 @@ struct CodableEditorView<Value>: View {
         VStack {
             if textStyle == .multiline {
                 typeDescriptionView
+                    .layoutPriority(1)
             }
 
             editor
