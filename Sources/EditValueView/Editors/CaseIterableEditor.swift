@@ -9,23 +9,36 @@
 import SwiftUI
 
 struct CaseIterableEditor<Value>: View {
-    
+
     let key: String
     @Binding private var value: Value
     @State private var index: Int = 0
-    
+
     private let allCases: [Value]
-    
+
+    var isNil: Bool {
+        if let optional = value as? any OptionalType {
+            return optional.wrapped == nil
+        }
+        return false
+    }
+
     init(_ value: Binding<Value>, key: String) {
         self._value = value
         self.key = key
-        
-        let type = Value.self as! any CaseIterable.Type
-        self.allCases = type.allCases as! Array<Value>
-        
+
+        switch Value.self {
+        case let type as any CaseIterable.Type:
+            self.allCases = type.allCases as! [Value]
+        case let type as any OptionalCaseIterable.Type:
+            self.allCases = type.optionalAllCases as! [Value]
+        default:
+            fatalError()
+        }
+
         self._index = .init(wrappedValue: allCases.firstIndex(where: { "\($0)" == "\(value.wrappedValue)" }) ?? 0)
     }
-    
+
     var body: some View {
         VStack {
             if allCases.isEmpty {
@@ -38,12 +51,12 @@ struct CaseIterableEditor<Value>: View {
             value = allCases[newValue]
         }
     }
-    
+
     @ViewBuilder
     var editor: some View {
         switch Value.self {
         case let type as any (CaseIterable & RawRepresentable).Type:
-            let allCases = type.allCases as! Array<Value>
+            let allCases = type.allCases as! [Value]
             Picker(key, selection: $index) {
                 ForEach(0..<allCases.count, id: \.self) {
                     let rawValue = (allCases[$0] as! (any RawRepresentable)).rawValue
@@ -52,9 +65,9 @@ struct CaseIterableEditor<Value>: View {
                 }
             }
             .pickerStyle(.automatic)
-            
+
         case let type as any CaseIterable.Type:
-            let allCases = type.allCases as! Array<Value>
+            let allCases = type.allCases as! [Value]
             Picker(key, selection: $index) {
                 ForEach(0..<allCases.count, id: \.self) {
                     let text = "\(allCases[$0])"
@@ -62,7 +75,28 @@ struct CaseIterableEditor<Value>: View {
                 }
             }
             .pickerStyle(.automatic)
-            
+
+        case let type as any OptionalCaseIterable.Type:
+            let allCases = type.optionalAllCases.compactMap { $0 }
+            Picker(key, selection: $index) {
+                ForEach(0..<allCases.count + 1, id: \.self) {
+                    if $0 == allCases.count {
+                        Text("Optional.nil").tag($0)
+                    } else {
+                        let `case` = allCases[$0]
+                        if let raw = (`case` as? (any RawRepresentable))?.rawValue {
+                            let text = "\(`case`) (\(raw))"
+                            Text(text).tag($0)
+                        } else {
+                            let text = "\(`case`)"
+                            Text(text).tag($0)
+                        }
+                    }
+                }
+            }
+            .pickerStyle(.automatic)
+            .accentColor(isNil ? .red : .accentColor)
+
         default:
             Text("this type is currently not supported.")
         }

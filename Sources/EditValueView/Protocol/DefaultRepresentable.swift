@@ -60,13 +60,13 @@ extension Data: DefaultRepresentable {
 }
 
 extension Array: DefaultRepresentable {
-    public static var defaultValue: Array<Element> {
+    public static var defaultValue: [Element] {
         []
     }
 }
 
 extension Dictionary: DefaultRepresentable {
-    public static var defaultValue: Dictionary<Key, Value> {
+    public static var defaultValue: [Key: Value] {
         [:]
     }
 }
@@ -85,7 +85,7 @@ extension CGSize: DefaultRepresentable {
 
 extension CGPoint: DefaultRepresentable {
     public static var defaultValue: CGPoint {
-        .init(x: 0 , y: 0)
+        .init(x: 0, y: 0)
     }
 }
 
@@ -94,7 +94,6 @@ extension CGRect: DefaultRepresentable {
         .init(origin: .defaultValue, size: .defaultValue)
     }
 }
-
 
 extension CGColor: DefaultRepresentable {
     public static var defaultValue: Self {
@@ -111,9 +110,23 @@ extension CIColor: DefaultRepresentable {
 }
 #endif
 
+#if canImport(SwiftUI)
+import SwiftUI
+extension Color: DefaultRepresentable {
+    public static var defaultValue: Self {
+        .black
+    }
+}
+#endif
 
 extension NSUIColor: DefaultRepresentable {
     public static var defaultValue: Self {
         .init()
+    }
+}
+
+extension Optional: DefaultRepresentable where Wrapped: DefaultRepresentable {
+    public static var defaultValue: Self {
+        Wrapped.defaultValue
     }
 }

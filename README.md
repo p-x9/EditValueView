@@ -18,23 +18,65 @@ Library that makes easy to display property edit screens for SwiftUI.
 
 |  Enum(CaseIterable)  |  Enum(CaseIterable & RawRepresentable)  |
 | ---- | ---- |
-|  ![Enum(CaseIterable)-light](https://user-images.githubusercontent.com/50244599/197402679-c6be841f-02ca-4db6-81ba-5e5e4893058d.png)  |  ![Enum(CaseIterable   RawRepresentable)-light](https://user-images.githubusercontent.com/50244599/197402678-dc8547ec-add7-436c-8cba-44d950f0d676.png)  | 
+|  ![Enum(CaseIterable)-light](https://user-images.githubusercontent.com/50244599/197402679-c6be841f-02ca-4db6-81ba-5e5e4893058d.png)  |  ![Enum(CaseIterable   RawRepresentable)-light](https://user-images.githubusercontent.com/50244599/197402678-dc8547ec-add7-436c-8cba-44d950f0d676.png)  |
 
 |  Codable  |
 |  ----  |
 |  ![Codable-light](https://user-images.githubusercontent.com/50244599/197402669-5fe684df-cbbe-4945-b89e-264e00fed733.png)  |
 
+## Supported types
+- String
+- Bool
+- any Numerics
+- Date
+- Color/UIColor/NSColor/CGColor/CIColor
+- Array(Codable)
+- Dictionary(Codable)
+- CaseIterable
+- CaseIterable & RawRepresentable
+- Codable
 
 ## Usage
 ### SwiftUI
+#### Initialize
+- Initialize with key and initial value
+  ```swift
+  var name = ""
+  EditValueView(key: "name", value: name)
+    .onUpdate { newValue in
+        name = newValue
+    }
+  ```
+- Initialize with keyPath
+  ```swift
+  EditValueView(target, key: "name", keyPath: \Item.name)
+    .onUpdate { newValue in
+        target[keyPath: \.name] = newValue
+    }
+  ```
+- Initialize with binding
+  ```swift
+  @State var name: String = ""
+  EditValueView(key: "name", binding: $name)
+  ```
+
+#### Update Handler
+You can receive an edit callback when you press the `save` button.
 ```swift
 EditValueView(target, key: "name", keyPath: \Item.name)
-    .onUpdate { target, newValue in
+    .onUpdate { newValue in
         // update
     }
-    .validate { target, newValue -> Bool in
+```
+
+#### Input Validation
+You can validate input values.
+```swift
+EditValueView(target, key: "name", keyPath: \Item.name)
+    .validate { newValue -> Bool in
         // input validation
-    } 
+        return !name.isEmpty
+    }
 ```
 
 ### UIKit
@@ -49,7 +91,8 @@ vc.validate = { target, newValue -> Bool in
 ```
 
 ### Protocol
-If you use a keypath of an optional type, either define a default value according to the `DefaultRepresentable` protocol or give the default value in the initilalize
+When using optional types, type hints for Codable cannot be displayed when nil is used.
+To avoid such problems, provide a default value in accordance with the protocol named `DefaultRepresentable`.
 
 ```swift
 struct Item: Codable {
@@ -65,7 +108,7 @@ struct Message: Codable {
 ```swift
 // Confirm to `DefaultRepresentable` protocol
 extension Item: DefaultRepresentable {
-    static var defaultValue: Self { 
+    static var defaultValue: Self {
         .init(name: "name", date: Date())
      }
 }
@@ -74,3 +117,6 @@ extension Item: DefaultRepresentable {
 // give default value
 EditValueView(target, key: "item", keyPath: \Message.item, defaultValue: .init(name: "name", date: Date()))
 ```
+
+## License
+EditValueView is released under the MIT License. See [LICENSE](./LICENSE)

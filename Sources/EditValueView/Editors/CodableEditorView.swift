@@ -10,12 +10,12 @@ import SwiftUI
 import SwiftUIColor
 
 struct CodableEditorView<Value>: View {
-    
+
     enum TextStyle {
         case single
         case multiline
     }
-    
+
     let key: String
 
     @Binding private var value: Value
@@ -28,27 +28,26 @@ struct CodableEditorView<Value>: View {
         self._value = value
         self._isValidType = isValidType
         self.key = key
-        
+
         self._textStyle = .init(initialValue: textStyle)
-        
+
         let codableValue = value.wrappedValue as! Codable
         self._text = .init(initialValue: codableValue.jsonString ?? "")
     }
-    
+
     var body: some View {
         VStack {
             if textStyle == .multiline {
                 typeDescriptionView
             }
-            
+
             editor
                 .onChange(of: text) { newValue in
                     textChanged(text: newValue)
                 }
-            
         }
     }
-    
+
     @ViewBuilder
     var typeDescriptionView: some View {
         HStack {
@@ -61,7 +60,7 @@ struct CodableEditorView<Value>: View {
         .background(Color.iOS.secondarySystemFill)
         .cornerRadius(8)
     }
-    
+
     @ViewBuilder
     var editor: some View {
         switch textStyle {
@@ -69,14 +68,15 @@ struct CodableEditorView<Value>: View {
             TextField("", text: $text)
                 .padding()
                 .border(.black, width: 0.5)
-            
+
         case .multiline:
             TextEditor(text: $text)
+                .frame(minHeight: 200, maxHeight: .infinity)
                 .border(.black, width: 0.5)
                 .padding(.vertical)
         }
     }
-    
+
     func textChanged(text: String) {
         let type = Value.self as! Codable.Type
         guard let value = type.value(from: text) as? Value else {
@@ -86,9 +86,13 @@ struct CodableEditorView<Value>: View {
         self.value = value
         isValidType = true
     }
-    
-    func typeDescription() -> String {
-        ValueType.extractType(for: value).typeName
-    }
 
+    func typeDescription() -> String {
+        if let optional = value as? (any OptionalType),
+           optional.wrapped == nil,
+           let type = Value.self as? any DefaultRepresentable.Type {
+            return ValueType.extractType(for: Optional.some(type.defaultValue)).typeName
+        }
+        return ValueType.extractType(for: value).typeName
+    }
 }

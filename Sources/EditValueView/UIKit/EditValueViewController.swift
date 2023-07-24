@@ -10,72 +10,70 @@
 import UIKit
 import SwiftUI
 
-public class EditValueViewController<Root, Value>: UIViewController {
-    
-    let target: Root
-    let key: String
-    let keyPath: PartialKeyPath<Root> // WritableKeyPath<Root, Value>
-    
-    public var onUpdate: ((Root, Value) -> Void)?
-    public var validate: ((Root, Value) -> Bool)?
-    
-    private var isWrappedOptional = false
-    
-    private var editValueView: EditValueView<Root, Value>
+public class EditValueViewController<Value>: UIViewController {
 
-    @_disfavoredOverload
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
-        self.target = target
+    /// Name of the property to be edited
+    /// Used for navigation titles and type descriptions.
+    let key: String
+
+    /// This is called when editing is completed by pressing the save button.
+    public var onUpdate: ((Value) -> Void)?
+
+    /// Used to perform validation checks when editing values
+    public var validate: ((Value) -> Bool)?
+
+    private var editValueView: EditValueView<Value>
+
+    /// Initialize with key and value
+    /// - Parameters:
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - value: Initial value of the value to be edited
+    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
         self.key = key
-        self.keyPath = keyPath
-        
+
         self.editValueView = .init(target, key: key, keyPath: keyPath)
-        
+
         super.init(nibName: nil, bundle: nil)
     }
-    
-    public init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>, defaultValue: Value) {
-        self.target = target
+
+    /// initialize with keyPath
+    /// - Parameters:
+    ///   - target: Target object that has the property to be edited.
+    ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
+    ///   - keyPath: keyPath of the property to be edited.
+    public init(key: String, value: Value) {
         self.key = key
-        self.keyPath = keyPath
-        self.isWrappedOptional = true
-        
-        self.editValueView = .init(target, key: key, keyPath: keyPath, defaultValue: defaultValue)
-        
+
+        self.editValueView = .init(key: key, value: value)
+
         super.init(nibName: nil, bundle: nil)
     }
-    
-    public convenience init(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Optional<Value>>) where Value: DefaultRepresentable {
-        self.init(target, key: key, keyPath: keyPath, defaultValue: Value.defaultValue)
-    }
-    
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func viewDidLoad() {
+
+    override public func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setupChildViewController()
     }
-    
+
     private func setupChildViewController() {
         editValueView = editValueView
-            .onUpdate { [weak self] target, value in
-                self?.onUpdate?(target, value)
+            .onUpdate { [weak self] value in
+                self?.onUpdate?(value)
             }
-            .validate { [weak self] target, value in
-                self?.validate?(target, value) ?? true
+            .validate { [weak self] value in
+                self?.validate?(value) ?? true
             }
-        
-        
+
         let vc = UIHostingController(rootView: editValueView)
         addChild(vc)
         view.addSubview(vc.view)
         vc.didMove(toParent: self)
-        
+
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             vc.view.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -84,7 +82,6 @@ public class EditValueViewController<Root, Value>: UIViewController {
             vc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    
 }
 
 #endif
