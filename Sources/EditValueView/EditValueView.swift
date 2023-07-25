@@ -131,7 +131,7 @@ public struct EditValueView<Value>: View {
         }
     }
 
-    /// Displays type infotmation
+    /// Displays type information
     @ViewBuilder
     var typeSection: some View {
         HStack {
@@ -195,6 +195,20 @@ public struct EditValueView<Value>: View {
 
         case let v as Binding<CIColor>:
             ColorEditorView(v, key: key)
+
+#if canImport(UIKit)
+        case let v as Binding<Image>:
+            SwiftUIImageEditor(image: v)
+
+        case let v as Binding<NSUIImage>:
+            ImageEditor(v)
+
+        case let v as Binding<CGImage>:
+            ImageEditor(v)
+
+        case let v as Binding<CIImage>:
+            ImageEditor(v)
+#endif
 
         case _ where Value.self is any CaseIterable.Type:
             CaseIterableEditor($value, key: key)
