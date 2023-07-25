@@ -44,10 +44,15 @@ struct ImageEditor<Value>: View {
 
     var body: some View {
         VStack {
+            if image != nil {
+                infoSection
+            }
+            
             HStack {
                 Text("tap to select image")
                     .foregroundColor(.gray)
                     .font(.footnote)
+                    .padding(.top)
                 Spacer()
             }
 
@@ -64,6 +69,29 @@ struct ImageEditor<Value>: View {
         }
         .actionSheet(isPresented: $isPresentedActionSheet) {
             actionSheet
+        }
+    }
+
+    @ViewBuilder
+    var infoSection: some View {
+        if let image {
+            VStack(alignment: .leading, spacing: 8) {
+                let size = """
+                width: \(String(format: "%.1f", image.size.width))
+                height: \(String(format: "%.1f", image.size.height))
+                """
+                HStack {
+                    Text(size)
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.gray)
+                    Spacer()
+                }
+            }
+            .padding()
+            .background(Color.iOS.secondarySystemFill)
+            .cornerRadius(8)
+        } else {
+            EmptyView()
         }
     }
 
