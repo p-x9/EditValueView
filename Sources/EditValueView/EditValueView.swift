@@ -342,6 +342,7 @@ struct Item {
     var date: Date
     var `enum`: Enum
     var enum2: Enum2?
+    var image: Image = .init(systemName: "swift")
     var color: Color
     var `codable`: ACodable = .init(text: "", number: 5)
     var array = ["AA", "BB"]
@@ -352,6 +353,10 @@ struct Item {
     var cgColor = NSUIColor.yellow.cgColor
     var uiColor = NSUIColor.blue
     var ciColor = CIColor(color: NSUIColor.brown)
+
+    var nsuiImage = NSUIImage(systemName: "swift")
+    var cgImage = NSUIImage(systemName: "swift")?.cgImage
+    var ciImage = NSUIImage(systemName: "swift")?.ciImage
 }
 
 struct ACodable: Codable {
@@ -372,15 +377,15 @@ struct BCodable: Codable {
     var optionalString: String?
 }
 
+let target: Item = .init(name: "Hello!!",
+                         bool: true,
+                         date: Date(),
+                         enum: .red,
+                         enum2: .blue,
+                         color: .white)
+
 struct EditValueView_Preview: PreviewProvider {
     static var previews: some View {
-        let target: Item = .init(name: "Hello!!",
-                                  bool: true,
-                                  date: Date(),
-                                  enum: .red,
-                                  enum2: .blue,
-                                  color: .white)
-
         Group {
             Group {
                 EditValueView(target, key: "name", keyPath: \Item.name)
@@ -416,23 +421,45 @@ struct EditValueView_Preview: PreviewProvider {
                     .previewDisplayName("Dictionary")
             }
 
-            Group {
-                EditValueView(target, key: "color", keyPath: \Item.color)
-                    .previewDisplayName("Color")
-
-                EditValueView(target, key: "ui/nsColor", keyPath: \Item.uiColor)
-                    .previewDisplayName("UI/NSColor")
-
-                EditValueView(target, key: "cgColor", keyPath: \Item.cgColor)
-                    .previewDisplayName("CGColor")
-
-                EditValueView(target, key: "ciColor", keyPath: \Item.ciColor)
-                    .previewDisplayName("CIColor")
-            }
-
             EditValueView(target, key: "codable", keyPath: \Item.codable)
                 .previewDisplayName("Codable")
 
+        }
+    }
+}
+
+struct EditValueView_Color_Preview: PreviewProvider {
+    static var previews: some View {
+        Group {
+            EditValueView(target, key: "color", keyPath: \Item.color)
+                .previewDisplayName("Color")
+
+            EditValueView(target, key: "ui/nsColor", keyPath: \Item.uiColor)
+                .previewDisplayName("UI/NSColor")
+
+            EditValueView(target, key: "cgColor", keyPath: \Item.cgColor)
+                .previewDisplayName("CGColor")
+
+            EditValueView(target, key: "ciColor", keyPath: \Item.ciColor)
+                .previewDisplayName("CIColor")
+        }
+    }
+}
+
+struct EditValueView_Image_Preview: PreviewProvider {
+    static var previews: some View {
+        Group {
+            EditValueView(target, key: "image", keyPath: \Item.image)
+                .previewDisplayName("Image")
+
+            EditValueView(target, key: "ns/uiImage", keyPath: \Item.nsuiImage)
+                .previewDisplayName("NS/UIImage")
+
+            EditValueView(target, key: "cgImage", keyPath: \Item.cgImage)
+                .previewDisplayName("CGImage")
+
+            EditValueView(target, key: "ciImage", keyPath: \Item.ciImage)
+                .previewDisplayName("CIImage")
         }
     }
 }
