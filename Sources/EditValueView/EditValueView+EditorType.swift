@@ -35,61 +35,61 @@ extension EditValueView {
 
     var editorType: EditorType {
         switch Value.self {
-        case _ as String.Type,
-            _ as String?.Type:
+        case is String.Type,
+            is String?.Type:
             return .string
 
-        case _ as Bool.Type,
-            _ as Bool?.Type:
+        case is Bool.Type,
+            is Bool?.Type:
             return .toggle
 
-        case _ as any Numeric.Type,
-            _ as any OptionalNumeric.Type:
+        case is any Numeric.Type,
+            is any OptionalNumeric.Type:
             return .codable(.single)
 
-        case _ as Date.Type,
-            _ as Date?.Type:
+        case is Date.Type,
+            is Date?.Type:
             return .date
 
-        case _ as Color.Type,
-            _ as Color?.Type:
+        case is Color.Type,
+            is Color?.Type:
             return .color
 
-        case _ as CGColor.Type,
-            _ as CGColor?.Type:
+        case is CGColor.Type,
+            is CGColor?.Type:
             return .color
 
-        case _ as NSUIColor.Type,
-            _ as NSUIColor?.Type:
+        case is NSUIColor.Type,
+            is NSUIColor?.Type:
             return .color
 
-        case _ as CIColor.Type,
-            _ as CIColor?.Type:
+        case is CIColor.Type,
+            is CIColor?.Type:
             return .color
 
 #if canImport(UIKit)
-        case _ as Image.Type,
-            _ as Image?.Type:
+        case is Image.Type,
+            is Image?.Type:
             return .image
 
-        case _ as NSUIImage.Type,
-            _ as NSUIImage?.Type:
+        case is NSUIImage.Type,
+            is NSUIImage?.Type:
             return .image
 
-        case _ as CGImage.Type,
-            _ as CGImage?.Type:
+        case is CGImage.Type,
+            is CGImage?.Type:
             return .image
 
-        case _ as CIImage.Type,
-            _ as CIImage?.Type:
+        case is CIImage.Type,
+            is CIImage?.Type:
             return .image
 #endif
 
-        case _ as any CaseIterable.Type,
-            _ as any OptionalCaseIterable.Type:
+        case is any CaseIterable.Type,
+            is any OptionalCaseIterable.Type:
             return .caseiterable
-
-        case _ as any Codable.Type:
+            
+        case is any Codable.Type:
             return .codable(.multi)
 
         default:
