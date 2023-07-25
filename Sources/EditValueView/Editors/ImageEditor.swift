@@ -26,17 +26,19 @@ struct ImageEditor<Value>: View {
 
     @Binding var value: Value
 
-    @State var image: NSUIImage
+    @State var image: NSUIImage?
     @State var sourceTypeOfPicker: SourceType?
     @State var isPresentedActionSheet = false
+
+    /// A boolean value that indicates whether the type being edited is an Optional type or not
+    var isOptional: Bool {
+        Value.self is any OptionalType.Type
+    }
 
     init(_ value: Binding<Value>) {
         self._value = value
 
-        guard let nsuiImage = Self.toNSUIImage(value.wrappedValue) else {
-            fatalError("not supported")
-        }
-
+        let nsuiImage = Self.toNSUIImage(value.wrappedValue)
         _image = .init(initialValue: nsuiImage)
     }
 
@@ -49,7 +51,7 @@ struct ImageEditor<Value>: View {
                 Spacer()
             }
 
-            imageView
+            editor
                 .onTapGesture {
                     isPresentedActionSheet = true
                 }
@@ -58,56 +60,103 @@ struct ImageEditor<Value>: View {
                 }
         }
         .sheet(item: $sourceTypeOfPicker) { type in
-            ImagePicker(sourceType: type.type, selectedImage: .init($image))
+            ImagePicker(sourceType: type.type, selectedImage: $image)
         }
         .actionSheet(isPresented: $isPresentedActionSheet) {
             actionSheet
         }
     }
 
-    var imageView: some View {
-        Image(uiImage: image)
-            .renderingMode(.original)
-            .resizable()
-            .scaledToFit()
-            .padding()
-            .border(.black, width: 0.5)
+    @ViewBuilder
+    var editor: some View {
+        if let image {
+            Image(uiImage: image)
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .padding()
+                .border(.black, width: 0.5)
+        } else if isOptional {
+            Color.iOS.secondarySystemFill
+                .overlay(
+                    Text("current value is nil")
+                        .foregroundColor(.gray)
+                )
+        } else {
+            Text("this type is currently not supported.")
+        }
     }
 
     var actionSheet: ActionSheet {
-        ActionSheet(
-            title: Text("Button"),
-            buttons: [
-                .default(Text("Photo Library")) {
-                    sourceTypeOfPicker = .library
-                },
-                .default(Text("Camera")) {
-                    sourceTypeOfPicker = .camera
-                },
-                .cancel()
+        var buttons: [ActionSheet.Button] = [
+            .default(Text("Photo Library")) {
+                sourceTypeOfPicker = .library
+            },
+            .default(Text("Camera")) {
+                sourceTypeOfPicker = .camera
+            },
+            .destructive(Text("Set nil")) {
+                image = nil
+            },
+            .cancel()
+        ]
 
-            ]
+        if !isOptional {
+            buttons.remove(at: 2)
+        }
+
+        return ActionSheet(
+            title: Text("Select source"),
+            buttons: buttons
         )
     }
 }
 
 extension ImageEditor {
-    func imageChanged(_ nsuiImage: NSUIImage) {
-        switch Value.self {
-        case is NSUIImage.Type:
-            value = nsuiImage as! Value
+    func imageChanged(_ nsuiImage: NSUIImage?) {
+        guard let nsuiImage else {
+            setNil()
+            return
+        }
+
+        switch $value {
+        case let v as Binding<NSUIImage>:
+            v.wrappedValue = nsuiImage
+
+        case let v as Binding<CIImage>:
+            if let ciImage = nsuiImage.ciImage {
+                v.wrappedValue = ciImage
+            }
+
+        case let v as Binding<CGImage> where Value.self is CGImage.Type:
+            if let cgImage = nsuiImage.cgImage {
+                v.wrappedValue = cgImage
+            }
+
+        case let v as Binding<NSUIImage?>:
+            v.wrappedValue = nsuiImage
+
+        case let v as Binding<CIImage?>:
+            v.wrappedValue = nsuiImage.ciImage
+
+        case let v as Binding<CGImage?> where Value.self is CGImage?.Type:
+            v.wrappedValue = nsuiImage.cgImage
+
+        default:
             break
+        }
+    }
 
-        case is CIImage.Type:
-            if let v = nsuiImage.ciImage {
-                value = v as! Value
-            }
+    func setNil() {
+        guard isOptional else { return }
 
-        case is CGImage.Type:
-            if let v = nsuiImage.cgImage {
-                value = v as! Value
-            }
-
+        switch $value {
+        case let v as Binding<NSUIImage?>:
+            v.wrappedValue = nil
+        case let v as Binding<CIImage?>:
+            v.wrappedValue = nil
+        case let v as Binding<CGImage?>:
+            v.wrappedValue = nil
         default:
             break
         }

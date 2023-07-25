@@ -198,7 +198,7 @@ public struct EditValueView<Value>: View {
 
 #if canImport(UIKit)
         case let v as Binding<Image>:
-            SwiftUIImageEditor(image: v)
+            SwiftUIImageEditor(image: .init(v), isOptional: false)
 
         case let v as Binding<NSUIImage>:
             ImageEditor(v)
@@ -242,6 +242,20 @@ public struct EditValueView<Value>: View {
 
         case let v as Binding<CIColor?> where !isNil:
             ColorEditorView(Binding(v)!, key: key)
+
+#if canImport(UIKit)
+        case let v as Binding<Image?>:
+            SwiftUIImageEditor(image: v, isOptional: true)
+
+        case let v as Binding<NSUIImage?>:
+            ImageEditor(v)
+
+        case let v as Binding<CGImage?>:
+            ImageEditor(v)
+
+        case let v as Binding<CIImage?>:
+            ImageEditor(v)
+#endif
 
         case _ where Value.self is any OptionalCaseIterable.Type:
             CaseIterableEditor($value, key: key)

@@ -24,9 +24,12 @@ struct SwiftUIImageEditor: View {
         }
     }
 
-    @Binding var image: Image
+    @Binding var image: Image?
     @State var sourceTypeOfPicker: SourceType?
     @State var isPresentedActionSheet = false
+
+    /// A boolean value that indicates whether the type being edited is an Optional type or not
+    var isOptional: Bool
 
     var body: some View {
         VStack {
@@ -37,41 +40,58 @@ struct SwiftUIImageEditor: View {
                 Spacer()
             }
 
-            imageView
+            editor
                 .onTapGesture {
                     isPresentedActionSheet = true
                 }
         }
         .sheet(item: $sourceTypeOfPicker) { type in
-            SwiftUIImagePicker(sourceType: type.type, selectedImage: .init($image))
+            SwiftUIImagePicker(sourceType: type.type, selectedImage: $image)
         }
         .actionSheet(isPresented: $isPresentedActionSheet) {
             actionSheet
         }
     }
 
-    var imageView: some View {
-        image
-            .renderingMode(.original)
-            .resizable()
-            .scaledToFit()
-            .padding()
-            .border(.black, width: 0.5)
+    @ViewBuilder
+    var editor: some View {
+        if let image {
+            image
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .padding()
+                .border(.black, width: 0.5)
+        } else {
+            Color.iOS.secondarySystemFill
+                .overlay(
+                    Text("current value is nil")
+                        .foregroundColor(.gray)
+                )
+        }
     }
 
     var actionSheet: ActionSheet {
-        ActionSheet(
-            title: Text("Button"),
-            buttons: [
-                .default(Text("Photo Library")) {
-                    sourceTypeOfPicker = .library
-                },
-                .default(Text("Camera")) {
-                    sourceTypeOfPicker = .camera
-                },
-                .cancel()
+        var buttons: [ActionSheet.Button] = [
+            .default(Text("Photo Library")) {
+                sourceTypeOfPicker = .library
+            },
+            .default(Text("Camera")) {
+                sourceTypeOfPicker = .camera
+            },
+            .destructive(Text("Set nil")) {
+                image = nil
+            },
+            .cancel()
+        ]
 
-            ]
+        if !isOptional {
+            buttons.remove(at: 2)
+        }
+
+        return ActionSheet(
+            title: Text("Select source"),
+            buttons: buttons
         )
     }
 }

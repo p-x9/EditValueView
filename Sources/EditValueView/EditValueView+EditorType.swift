@@ -19,12 +19,13 @@ extension EditValueView {
         case codable(Line)
         case caseiterable
         case color
+        case image
         case date
         case none
 
         var shouldShowOptionalEditor: Bool {
             switch self {
-            case .codable(.multi), .caseiterable:
+            case .image, .codable(.multi), .caseiterable:
                 return false
             default:
                 return true
@@ -65,6 +66,24 @@ extension EditValueView {
         case _ as CIColor.Type,
             _ as CIColor?.Type:
             return .color
+
+#if canImport(UIKit)
+        case _ as Image.Type,
+            _ as Image?.Type:
+            return .image
+
+        case _ as NSUIImage.Type,
+            _ as NSUIImage?.Type:
+            return .image
+
+        case _ as CGImage.Type,
+            _ as CGImage?.Type:
+            return .image
+
+        case _ as CIImage.Type,
+            _ as CIImage?.Type:
+            return .image
+#endif
 
         case _ as any CaseIterable.Type,
             _ as any OptionalCaseIterable.Type:
