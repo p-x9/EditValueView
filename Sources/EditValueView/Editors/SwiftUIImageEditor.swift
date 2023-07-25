@@ -27,6 +27,7 @@ struct SwiftUIImageEditor: View {
     @Binding var image: Image?
     @State var sourceTypeOfPicker: SourceType?
     @State var isPresentedActionSheet = false
+    @State var isPresentedFileImporter = false
 
     /// A boolean value that indicates whether the type being edited is an Optional type or not
     var isOptional: Bool
@@ -50,6 +51,18 @@ struct SwiftUIImageEditor: View {
         }
         .actionSheet(isPresented: $isPresentedActionSheet) {
             actionSheet
+        }
+        .fileImporter(
+            isPresented: $isPresentedFileImporter,
+            allowedContentTypes: [.image],
+            allowsMultipleSelection: false
+        ) { result in
+            if case let .success(urls) = result,
+               let url = urls.first,
+               url.startAccessingSecurityScopedResource(),
+               let nsuiImage = NSUIImage(contentsOfFile: url.path) {
+                image = Image(uiImage: nsuiImage)
+            }
         }
     }
 
@@ -78,6 +91,9 @@ struct SwiftUIImageEditor: View {
             },
             .default(Text("Camera")) {
                 sourceTypeOfPicker = .camera
+            },
+            .default(Text("File")) {
+                isPresentedFileImporter = true
             },
             .destructive(Text("Set nil")) {
                 image = nil
