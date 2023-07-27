@@ -42,6 +42,9 @@ Library that makes easy to display property edit screens for SwiftUI.
 - Codable
 
 ## Usage
+> **Note**
+> If you want to use the camera for editing images, you must add a key named `NSCameraUsageDescription` to the info.plist file.
+
 ### SwiftUI
 #### Initialize
 - Initialize with key and initial value
