@@ -12,6 +12,10 @@ Library that makes easy to display property edit screens for SwiftUI.
 | ---- | ---- | ---- |
 |  ![Double-light](https://user-images.githubusercontent.com/50244599/197402677-cb2a90ca-58fa-4d2d-8459-fa2539836c36.png) |  ![Date-light](https://user-images.githubusercontent.com/50244599/197402673-414f5b2d-9031-4ad3-81de-300d85e5ad56.png)  |  ![Color-light](https://user-images.githubusercontent.com/50244599/197402671-8a224878-ab39-4471-b072-cbb19a2d38b9.png)  |
 
+|  Image  |  UI/NSImage  |
+| ---- | ---- |
+|  ![Image-light](https://github.com/p-x9/EditValueView/assets/50244599/792faddd-96c8-476c-8d9f-1b8c250972ee)  |  ![UIImage-light](https://github.com/p-x9/EditValueView/assets/50244599/e6f2a27f-5d8f-4aca-a7fd-cfe6a8c1a952)  |
+
 |  Array  |  Dictionary  |
 | ---- | ---- |
 |  ![Array-light](https://user-images.githubusercontent.com/50244599/197402664-fce3326c-824d-4853-9a5b-47903ccdf470.png)  |  ![Dictionary-light](https://user-images.githubusercontent.com/50244599/197402675-d1dd4bdb-6135-4c45-89f9-2f640daf9f3d.png)  |
@@ -30,6 +34,7 @@ Library that makes easy to display property edit screens for SwiftUI.
 - any Numerics
 - Date
 - Color/UIColor/NSColor/CGColor/CIColor
+- Image/UIImage/CGImage/CIImage (iOS Only)
 - Array(Codable)
 - Dictionary(Codable)
 - CaseIterable
@@ -37,6 +42,9 @@ Library that makes easy to display property edit screens for SwiftUI.
 - Codable
 
 ## Usage
+> **Note**
+> If you want to use the camera for editing images, you must add a key named `NSCameraUsageDescription` to the info.plist file.
+
 ### SwiftUI
 #### Initialize
 - Initialize with key and initial value

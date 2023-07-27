@@ -42,6 +42,20 @@ extension EditValueView {
         case let v as Binding<CIColor?>:
             v.wrappedValue = nil
 
+#if canImport(UIKit)
+        case let v as Binding<Image?>:
+            v.wrappedValue = nil
+
+        case let v as Binding<NSUIImage?>:
+            v.wrappedValue = nil
+
+        case let v as Binding<CGImage?>:
+            v.wrappedValue = nil
+
+        case let v as Binding<CIImage?>:
+            v.wrappedValue = nil
+#endif
+
         case _ where Value.self is any Codable.Type,
             _ where Value.self is any OptionalNumeric.Type:
             if let type = Value.self as? any Codable.Type,

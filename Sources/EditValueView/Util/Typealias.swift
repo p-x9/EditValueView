@@ -9,9 +9,11 @@
 #if canImport(UIKit)
 import UIKit
 typealias NSUIColor = UIColor
+typealias NSUIImage = UIImage
 #endif
 
 #if canImport(Cocoa)
 import Cocoa
 typealias NSUIColor = NSColor
+typealias NSUIImage = NSImage
 #endif

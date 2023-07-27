@@ -19,12 +19,13 @@ extension EditValueView {
         case codable(Line)
         case caseiterable
         case color
+        case image
         case date
         case none
 
         var shouldShowOptionalEditor: Bool {
             switch self {
-            case .codable(.multi), .caseiterable:
+            case .image, .codable(.multi), .caseiterable:
                 return false
             default:
                 return true
@@ -34,43 +35,61 @@ extension EditValueView {
 
     var editorType: EditorType {
         switch Value.self {
-        case _ as String.Type,
-            _ as String?.Type:
+        case is String.Type,
+            is String?.Type:
             return .string
 
-        case _ as Bool.Type,
-            _ as Bool?.Type:
+        case is Bool.Type,
+            is Bool?.Type:
             return .toggle
 
-        case _ as any Numeric.Type,
-            _ as any OptionalNumeric.Type:
+        case is any Numeric.Type,
+            is any OptionalNumeric.Type:
             return .codable(.single)
 
-        case _ as Date.Type,
-            _ as Date?.Type:
+        case is Date.Type,
+            is Date?.Type:
             return .date
 
-        case _ as Color.Type,
-            _ as Color?.Type:
+        case is Color.Type,
+            is Color?.Type:
             return .color
 
-        case _ as CGColor.Type,
-            _ as CGColor?.Type:
+        case is CGColor.Type,
+            is CGColor?.Type:
             return .color
 
-        case _ as NSUIColor.Type,
-            _ as NSUIColor?.Type:
+        case is NSUIColor.Type,
+            is NSUIColor?.Type:
             return .color
 
-        case _ as CIColor.Type,
-            _ as CIColor?.Type:
+        case is CIColor.Type,
+            is CIColor?.Type:
             return .color
 
-        case _ as any CaseIterable.Type,
-            _ as any OptionalCaseIterable.Type:
+#if canImport(UIKit)
+        case is Image.Type,
+            is Image?.Type:
+            return .image
+
+        case is NSUIImage.Type,
+            is NSUIImage?.Type:
+            return .image
+
+        case is CGImage.Type,
+            is CGImage?.Type:
+            return .image
+
+        case is CIImage.Type,
+            is CIImage?.Type:
+            return .image
+#endif
+
+        case is any CaseIterable.Type,
+            is any OptionalCaseIterable.Type:
             return .caseiterable
-
-        case _ as any Codable.Type:
+            
+        case is any Codable.Type:
             return .codable(.multi)
 
         default:
