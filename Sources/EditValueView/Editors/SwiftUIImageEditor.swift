@@ -45,6 +45,7 @@ struct SwiftUIImageEditor: View {
                 .onTapGesture {
                     isPresentedActionSheet = true
                 }
+                .onDrop(of: [.image], isTargeted: nil, perform: handleDropImage(providers:))
         }
         .sheet(item: $sourceTypeOfPicker) { type in
             SwiftUIImagePicker(sourceType: type.type, selectedImage: $image)
@@ -111,4 +112,20 @@ struct SwiftUIImageEditor: View {
         )
     }
 }
+
+extension SwiftUIImageEditor {
+    func handleDropImage(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+
+        provider.loadObject(ofClass: NSUIImage.self) { item, error in
+            guard let image = item as? NSUIImage else { return }
+            DispatchQueue.main.async {
+                self.image = Image(uiImage: image)
+            }
+        }
+
+        return true
+    }
+}
+
 #endif

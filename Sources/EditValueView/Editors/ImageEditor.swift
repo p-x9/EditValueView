@@ -64,6 +64,7 @@ struct ImageEditor<Value>: View {
                 .onChange(of: image) { newValue in
                     imageChanged(newValue)
                 }
+                .onDrop(of: [.image], isTargeted: nil, perform: handleDropImage(providers:))
         }
         .sheet(item: $sourceTypeOfPicker) { type in
             ImagePicker(sourceType: type.type, selectedImage: $image)
@@ -156,6 +157,7 @@ struct ImageEditor<Value>: View {
 }
 
 extension ImageEditor {
+    @MainActor
     func imageChanged(_ nsuiImage: NSUIImage?) {
         guard let nsuiImage else {
             setNil()
@@ -190,6 +192,7 @@ extension ImageEditor {
         }
     }
 
+    @MainActor
     func setNil() {
         guard isOptional else { return }
 
@@ -207,7 +210,6 @@ extension ImageEditor {
 }
 
 extension ImageEditor {
-    
     static func toNSUIImage(_ value: Value) -> NSUIImage? {
         switch value {
         case let v as NSUIImage:
@@ -222,6 +224,21 @@ extension ImageEditor {
         default:
             return nil
         }
+    }
+}
+
+extension ImageEditor {
+    func handleDropImage(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+
+        provider.loadObject(ofClass: NSUIImage.self) { item, error in
+            guard let image = item as? NSUIImage else { return }
+            DispatchQueue.main.async {
+                self.image = image
+            }
+        }
+
+        return true
     }
 }
 
