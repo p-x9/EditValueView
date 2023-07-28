@@ -64,42 +64,53 @@ public struct EditValueView<Value>: View {
     @Environment(\.presentationMode) private var presentationMode
 
     public var body: some View {
-        NavigationView {
-            GeometryReader{ proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 8) {
-                        header
+        if presentationMode.wrappedValue.isPresented {
+            _body
+        } else {
+            NavigationView {
+                _body
+            }
+        }
+    }
 
-                        typeSection
-                            .padding(.top)
+    @MainActor
+    var _body: some View {
+        GeometryReader{ proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    header
 
-                        if isOptional && shouldShowOptionalEditor {
-                            optionalEditor
-                                .padding()
-                                .border(.black, width: 0.5)
-                                .padding(.vertical)
-                        }
+                    typeSection
+                        .padding(.top)
 
-                        if !shouldSetNil && !isNil || !shouldShowOptionalEditor {
-                            editor
-                                .padding(.vertical)
-                                .layoutPriority(.infinity)
-                        }
-
-                        Spacer()
+                    if isOptional && shouldShowOptionalEditor {
+                        optionalEditor
+                            .padding()
+                            .border(.black, width: 0.5)
+                            .padding(.vertical)
                     }
-                    .padding()
-                    .frame(minHeight: proxy.size.height)
-                    .navigationTitle(key)
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button("Save") {
-                                save()
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                            .disabled(!isValid)
+
+                    if !shouldSetNil && !isNil || !shouldShowOptionalEditor {
+                        editor
+                            .padding(.vertical)
+                            .layoutPriority(.infinity)
+                    }
+
+                    Spacer()
+                }
+                .padding()
+                .frame(minHeight: proxy.size.height)
+                .navigationTitle(key)
+                .toolbar {
+                    ToolbarItem(placement: .destructiveAction) {
+                        Button("Save") {
+                            save()
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        ToolbarItem(placement: .cancellationAction) {
+                        .disabled(!isValid)
+                    }
+                    ToolbarItem(placement: .cancellationAction) {
+                        if !presentationMode.wrappedValue.isPresented {
                             Button("Cancel") {
                                 presentationMode.wrappedValue.dismiss()
                             }
