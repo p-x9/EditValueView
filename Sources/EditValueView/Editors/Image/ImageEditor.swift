@@ -169,7 +169,7 @@ extension ImageEditor {
             v.wrappedValue = nsuiImage
 
         case let v as Binding<CIImage>:
-            if let ciImage = nsuiImage.ciImage {
+            if let ciImage = nsuiImage.toCIImage() {
                 v.wrappedValue = ciImage
             }
 
@@ -182,7 +182,7 @@ extension ImageEditor {
             v.wrappedValue = nsuiImage
 
         case let v as Binding<CIImage?>:
-            v.wrappedValue = nsuiImage.ciImage
+            v.wrappedValue = nsuiImage.toCIImage()
 
         case let v as Binding<CGImage?> where Value.self is CGImage?.Type:
             v.wrappedValue = nsuiImage.cgImage
@@ -216,9 +216,12 @@ extension ImageEditor {
             return v
 
         case let v as CIImage:
-            return .init(ciImage: v)
+            return v.uiImage
 
         case let v as CGImage where Value.self is CGImage.Type:
+            return .init(cgImage: v)
+
+        case let v as CGImage where Value.self is CGImage?.Type:
             return .init(cgImage: v)
 
         default:
