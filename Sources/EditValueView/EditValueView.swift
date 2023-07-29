@@ -10,10 +10,19 @@ import SwiftUIColor
 
 @available(iOS 14, *)
 public struct EditValueView<Value>: View {
+    public enum PresentationStyle {
+        case modal
+        case push
+    }
 
     /// Name of the property to be edited
     /// Used for navigation titles and type descriptions.
     let key: String
+
+    /// Presentation style.
+    /// If set to `modal`, it will be wrapped in NavigationView
+    /// On the other hand, if `push` is specified, it is not wrapped in NavigationView and must contain NavigationView as its parent.
+    let presentationStyle: PresentationStyle
 
     /// This is called when editing is completed by pressing the save button.
     /// They will be received by a modifier named `onUpdate`.
@@ -64,7 +73,7 @@ public struct EditValueView<Value>: View {
     @Environment(\.presentationMode) private var presentationMode
 
     public var body: some View {
-        if presentationMode.wrappedValue.isPresented {
+        if presentationStyle == .push {
             _body
         } else {
             NavigationView {
@@ -110,7 +119,7 @@ public struct EditValueView<Value>: View {
                         .disabled(!isValid)
                     }
                     ToolbarItem(placement: .cancellationAction) {
-                        if !presentationMode.wrappedValue.isPresented {
+                        if presentationStyle != .push {
                             Button("Cancel") {
                                 presentationMode.wrappedValue.dismiss()
                             }
@@ -311,9 +320,13 @@ extension EditValueView {
     /// - Parameters:
     ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
     ///   - value: Initial value of the value to be edited
-    public init(key: String, value: Value) {
+    ///   - presentationStyle: Presentation style. If set to `modal`,
+    ///    it will be wrapped in NavigationView.
+    ///    On the other hand, if `push` is specified, it is not wrapped in NavigationView and must contain NavigationView as its parent.
+    public init(key: String, value: Value, presentationStyle: PresentationStyle = .modal) {
         self.key = key
         self._value = .init(initialValue: value)
+        self.presentationStyle = presentationStyle
     }
 
     /// Initialize with keyPath
@@ -321,18 +334,27 @@ extension EditValueView {
     ///   - target: Target object that has the property to be edited.
     ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
     ///   - keyPath: keyPath of the property to be edited.
-    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
-        self.init(key: key, value: target[keyPath: keyPath])
+    ///   - presentationStyle: Presentation style. If set to `modal`,
+    ///    it will be wrapped in NavigationView.
+    ///    On the other hand, if `push` is specified, it is not wrapped in NavigationView and must contain NavigationView as its parent.
+    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>, presentationStyle: PresentationStyle = .modal) {
+        self.init(key: key,
+                  value: target[keyPath: keyPath],
+                  presentationStyle: presentationStyle)
     }
 
     /// Initialize with binding
     /// - Parameters:
     ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
     ///   - binding: Binder for the value to be edited
-    public init(key: String, binding: Binding<Value>) {
+    ///   - presentationStyle: Presentation style. If set to `modal`,
+    ///    it will be wrapped in NavigationView.
+    ///    On the other hand, if `push` is specified, it is not wrapped in NavigationView and must contain NavigationView as its parent.
+    public init(key: String, binding: Binding<Value>, presentationStyle: PresentationStyle = .modal) {
         self.key = key
         self._value = .init(initialValue: binding.wrappedValue)
         self.binding = binding
+        self.presentationStyle = presentationStyle
     }
 }
 
