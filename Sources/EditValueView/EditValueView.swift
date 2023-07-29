@@ -22,7 +22,7 @@ public struct EditValueView<Value>: View {
     /// Presentation style.
     /// If set to `modal`, it will be wrapped in NavigationView
     /// On the other hand, if `push` is specified, it is not wrapped in NavigationView and must contain NavigationView as its parent.
-    let presentationStyle: PresentationStyle
+    var presentationStyle: PresentationStyle
 
     /// This is called when editing is completed by pressing the save button.
     /// They will be received by a modifier named `onUpdate`.
@@ -355,6 +355,12 @@ extension EditValueView {
         self._value = .init(initialValue: binding.wrappedValue)
         self.binding = binding
         self.presentationStyle = presentationStyle
+    }
+}
+
+extension EditValueView {
+    public func presentationStyle(_ style: PresentationStyle) -> Self {
+        set(style, for: \.presentationStyle)
     }
 }
 
