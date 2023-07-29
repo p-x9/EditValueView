@@ -327,6 +327,8 @@ extension EditValueView {
         self.key = key
         self._value = .init(initialValue: value)
         self.presentationStyle = presentationStyle
+
+        self._shouldSetNil = .init(initialValue: isNil)
     }
 
     /// Initialize with keyPath
@@ -355,6 +357,8 @@ extension EditValueView {
         self._value = .init(initialValue: binding.wrappedValue)
         self.binding = binding
         self.presentationStyle = presentationStyle
+
+        self._shouldSetNil = .init(initialValue: isNil)
     }
 }
 
