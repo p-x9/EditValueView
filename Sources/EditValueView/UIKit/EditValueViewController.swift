@@ -10,7 +10,7 @@
 import UIKit
 import SwiftUI
 
-public class EditValueViewController<Value>: UIViewController {
+public class EditValueViewController<Value>: UIHostingController<EditValueView<Value>> {
 
     /// Name of the property to be edited
     /// Used for navigation titles and type descriptions.
@@ -22,18 +22,26 @@ public class EditValueViewController<Value>: UIViewController {
     /// Used to perform validation checks when editing values
     public var validate: ((Value) -> Bool)?
 
-    private var editValueView: EditValueView<Value>
-
     /// Initialize with key and value
     /// - Parameters:
     ///   - key: Name of the property to be edited. Used for navigation titles and type descriptions.
     ///   - value: Initial value of the value to be edited
-    public init<Root>(_ target: Root, key: String, keyPath: WritableKeyPath<Root, Value>) {
+    public init<Root>(
+        _ target: Root,
+        key: String,
+        keyPath: WritableKeyPath<Root, Value>
+    ) {
         self.key = key
 
-        self.editValueView = .init(target, key: key, keyPath: keyPath)
+        super.init(rootView: .init(target, key: key, keyPath: keyPath))
 
-        super.init(nibName: nil, bundle: nil)
+        rootView = rootView
+            .onUpdate({ newValue in
+                self.onUpdate?(newValue)
+            })
+            .validate({ newValue in
+                self.validate?(newValue) ?? true
+            })
     }
 
     /// initialize with keyPath
@@ -44,9 +52,15 @@ public class EditValueViewController<Value>: UIViewController {
     public init(key: String, value: Value) {
         self.key = key
 
-        self.editValueView = .init(key: key, value: value)
+        super.init(rootView: .init(key: key, value: value))
 
-        super.init(nibName: nil, bundle: nil)
+        rootView = rootView
+            .onUpdate({ newValue in
+                self.onUpdate?(newValue)
+            })
+            .validate({ newValue in
+                self.validate?(newValue) ?? true
+            })
     }
 
     @available(*, unavailable)
@@ -54,33 +68,19 @@ public class EditValueViewController<Value>: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override public func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupChildViewController()
-    }
+        let style: EditValueView<Value>.PresentationStyle
 
-    private func setupChildViewController() {
-        editValueView = editValueView
-            .onUpdate { [weak self] value in
-                self?.onUpdate?(value)
-            }
-            .validate { [weak self] value in
-                self?.validate?(value) ?? true
-            }
+        if navigationController == nil {
+            style = .modal
+        } else {
+            style = .push
+        }
 
-        let vc = UIHostingController(rootView: editValueView)
-        addChild(vc)
-        view.addSubview(vc.view)
-        vc.didMove(toParent: self)
-
-        vc.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            vc.view.leftAnchor.constraint(equalTo: view.leftAnchor),
-            vc.view.rightAnchor.constraint(equalTo: view.rightAnchor),
-            vc.view.topAnchor.constraint(equalTo: view.topAnchor),
-            vc.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        rootView = rootView
+            .presentationStyle(style)
     }
 }
 

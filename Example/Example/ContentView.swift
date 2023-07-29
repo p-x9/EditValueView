@@ -12,11 +12,11 @@ import UIKit
 
 struct ContentView: View {
     @State var target: Item = .init(name: "text",
-                             bool: false,
-                             date: Date(),
-                             enum: .red,
-                             enum2: .blue,
-                             color: .white)
+                                    bool: false,
+                                    date: Date(),
+                                    enum: .red,
+                                    enum2: .blue,
+                                    color: .white)
 
     var body: some View {
         NavigationView {
@@ -41,23 +41,33 @@ struct ContentView: View {
             editValueView(title: "Date", key: "date", keyPath: \.date)
 
             NavigationLink("Int", destination: {
-                EditValueView(target, key: "number", keyPath: \Item.codable.number)
-                    .onUpdate { newValue in
-                        target.codable.number = newValue
-                    }
-                    .validate { newValue in
-                        newValue.isMultiple(of: 2)
-                    }
+                EditValueView(
+                    target,
+                    key: "number",
+                    keyPath: \Item.codable.number,
+                    presentationStyle: .push
+                )
+                .onUpdate { newValue in
+                    target.codable.number = newValue
+                }
+                .validate { newValue in
+                    newValue.isMultiple(of: 2)
+                }
             })
 
             NavigationLink("Double") {
-                EditValueView(target, key: "double", keyPath: \Item.codable.double)
-                    .onUpdate { newValue in
-                        target.codable.double = newValue
-                    }
-                    .validate { newValue in
-                        newValue > 0
-                    }
+                EditValueView(
+                    target,
+                    key: "double",
+                    keyPath: \Item.codable.double,
+                    presentationStyle: .push
+                )
+                .onUpdate { newValue in
+                    target.codable.double = newValue
+                }
+                .validate { newValue in
+                    newValue > 0
+                }
             }
         } header: {
             Text("Standard")
@@ -117,7 +127,9 @@ struct ContentView: View {
     var notSupportedType: some View {
         Section {
             NavigationLink("Not Supported") {
-                EditValueView(key: "item", binding: $target)
+                EditValueView(key: "item",
+                              binding: $target,
+                              presentationStyle: .push)
             }
         } header: {
             Text("Not Supported")
@@ -130,10 +142,15 @@ struct ContentView: View {
         keyPath: WritableKeyPath<Item, Value>
     ) -> NavigationLink<Text, EditValueView<Value>> {
         NavigationLink(title) {
-            EditValueView(target, key: key, keyPath: keyPath)
-                .onUpdate { newValue in
-                    target[keyPath: keyPath] = newValue
-                }
+            EditValueView(
+                target,
+                key: key,
+                keyPath: keyPath,
+                presentationStyle: .push
+            )
+            .onUpdate { newValue in
+                target[keyPath: keyPath] = newValue
+            }
         }
     }
 }
