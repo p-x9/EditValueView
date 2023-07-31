@@ -234,7 +234,7 @@ public struct EditValueView<Value>: View {
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-        /* Optional Type */
+            /* Optional Type */
         case let v as Binding<String?> where !isNil:
             TextEditor(text: Binding(v)!)
                 .frame(minHeight: 200, maxHeight: .infinity)
@@ -281,7 +281,7 @@ public struct EditValueView<Value>: View {
             CaseIterableEditor($value, key: key)
                 .border(.black, width: 0.5)
 
-        /* Other */
+            /* Other */
         case _ where Value.self is any Codable.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType)
 
@@ -397,9 +397,11 @@ struct Item {
     var uiColor = NSUIColor.blue
     var ciColor = CIColor(color: NSUIColor.brown)
 
+#if canImport(UIKit)
     var nsuiImage = NSUIImage(systemName: "swift")
     var cgImage = NSUIImage(systemName: "swift")?.cgImage
     var ciImage = NSUIImage(systemName: "swift")?.ciImage
+#endif
 }
 
 struct ACodable: Codable {
@@ -489,6 +491,7 @@ struct EditValueView_Color_Preview: PreviewProvider {
     }
 }
 
+#if canImport(UIKit)
 struct EditValueView_Image_Preview: PreviewProvider {
     static var previews: some View {
         Group {
@@ -506,4 +509,5 @@ struct EditValueView_Image_Preview: PreviewProvider {
         }
     }
 }
+#endif
 #endif
