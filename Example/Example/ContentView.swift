@@ -83,6 +83,7 @@ struct ContentView: View {
             editValueView(title: "Array", key: "array", keyPath: \.array)
 
             editValueView(title: "Dictionary", key: "dictionary", keyPath: \.dictionary)
+            editValueView(title: "Any Dictionary", key: "anyDictionary", keyPath: \.anyDictionary)
         } header: {
             Text("Collection")
         }
@@ -192,6 +193,7 @@ struct Item {
     var nsuiImage = UIImage(systemName: "swift")
     var cgImage = UIImage(systemName: "swift")?.cgImage
     var ciImage = UIImage(systemName: "swift")?.ciImage
+    var anyDictionary: [String: Any] = ["AA": 0]
 }
 
 struct ACodable: Codable {

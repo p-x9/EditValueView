@@ -286,7 +286,11 @@ public struct EditValueView<Value>: View {
             CodableEditorView($value, key: key, isValidType: $isValidType)
 
         default:
-            notSupportedView
+            if let anyJSONEditor = AnyJSONEditor($value, key: key, isValidType: $isValidType) {
+                anyJSONEditor
+            } else {
+                notSupportedView
+            }
         }
     }
 
@@ -401,6 +405,7 @@ struct Item {
     var nsuiImage = NSUIImage(systemName: "swift")
     var cgImage = NSUIImage(systemName: "swift")?.cgImage
     var ciImage = NSUIImage(systemName: "swift")?.ciImage
+    var anyDictionary: [String: Any] = ["AA": 0]
 #endif
 }
 
@@ -469,6 +474,8 @@ struct EditValueView_Preview: PreviewProvider {
             EditValueView(target, key: "codable", keyPath: \Item.codable)
                 .previewDisplayName("Codable")
 
+            EditValueView(target, key: "anyDictionary", keyPath: \Item.anyDictionary)
+                .previewDisplayName("Any Dictionary")
         }
     }
 }
