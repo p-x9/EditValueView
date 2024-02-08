@@ -146,7 +146,7 @@ struct ImageEditor<Value>: View {
         ]
 
         if !isOptional {
-            buttons.remove(at: 3)
+            buttons.remove(at: buttons.count - 2)
         }
 
         return ActionSheet(

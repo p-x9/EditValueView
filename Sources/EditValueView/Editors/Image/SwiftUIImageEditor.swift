@@ -103,7 +103,7 @@ struct SwiftUIImageEditor: View {
         ]
 
         if !isOptional {
-            buttons.remove(at: 2)
+            buttons.remove(at: buttons.count - 2)
         }
 
         return ActionSheet(
