@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MagicMirror
 
 enum ValueType {
     case int
@@ -81,11 +82,13 @@ extension ValueType {
             return .optional(.unknown())
         }
 
-        let mirror = Mirror(reflecting: value)
+        let mirror = MagicMirror(reflecting: value)
 
-        let isOptional = mirror.displayStyle == .optional
+        let optional = value as? (any OptionalType)
+        let isOptional = optional != nil
 
         var type = "\(mirror.subjectType)"
+
         if isOptional {
             type.removeFirst(9)
             type.removeLast(1)
@@ -123,9 +126,9 @@ extension ValueType {
             break
         }
 
-        if let optional = value as? (any OptionalType),
+        if let optional,
            let wrapped = optional.wrapped {
-            let nestedMirror = Mirror(reflecting: wrapped)
+            let nestedMirror = MagicMirror(reflecting: wrapped)
 
             if nestedMirror.displayStyle == .struct || nestedMirror.displayStyle == .class {
                 return .optional(extractClassOrStruct(with: nestedMirror))
@@ -143,7 +146,7 @@ extension ValueType {
         return isOptional ? .optional(.unknown(type)) : .unknown(type)
     }
 
-    private static func extractClassOrStruct(with mirror: Mirror) -> ValueType {
+    private static func extractClassOrStruct(with mirror: MagicMirror) -> ValueType {
         guard mirror.displayStyle == .class || mirror.displayStyle == .struct else {
             fatalError()
         }
