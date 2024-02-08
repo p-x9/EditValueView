@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MagicMirror
 
 enum ValueType {
     case int
@@ -24,11 +25,11 @@ enum ValueType {
 
     case unknown(String? = nil)
 
-    var typeName: String {
-        _typeName(nestDepth: 0)
+    var typeDescription: String {
+        _typeDescription(nestDepth: 0)
     }
 
-    private func _typeName(nestDepth: Int) -> String {
+    private func _typeDescription(nestDepth: Int) -> String {
         switch self {
         case .int:
             return "Int"
@@ -46,13 +47,13 @@ enum ValueType {
             return "Data"
 
         case let .optional(content):
-            return "\(content.typeName)?"
+            return "\(content.typeDescription)?"
 
         case let .array(content):
-            return "[\(content.typeName)]"
+            return "[\(content.typeDescription)]"
 
         case let .dictionary(key, value):
-            return "[\(key.typeName): \(value.typeName)]"
+            return "[\(key.typeDescription): \(value.typeDescription)]"
 
         case let .classOrStruct(dictionary):
             let tab = String(repeating: " ", count: nestDepth * 2)
@@ -61,7 +62,7 @@ enum ValueType {
                     lhs.key < rhs.key
                 })
                 .map {
-                    tab + "  \($0): \($1._typeName(nestDepth: nestDepth + 1))"
+                    tab + "  \($0): \($1._typeDescription(nestDepth: nestDepth + 1))"
                 }
             return """
             {
@@ -81,11 +82,13 @@ extension ValueType {
             return .optional(.unknown())
         }
 
-        let mirror = Mirror(reflecting: value)
+        let mirror = MagicMirror(reflecting: value)
 
-        let isOptional = mirror.displayStyle == .optional
+        let optional = value as? (any OptionalType)
+        let isOptional = optional != nil
 
         var type = "\(mirror.subjectType)"
+
         if isOptional {
             type.removeFirst(9)
             type.removeLast(1)
@@ -123,9 +126,9 @@ extension ValueType {
             break
         }
 
-        if let optional = value as? (any OptionalType),
+        if let optional,
            let wrapped = optional.wrapped {
-            let nestedMirror = Mirror(reflecting: wrapped)
+            let nestedMirror = MagicMirror(reflecting: wrapped)
 
             if nestedMirror.displayStyle == .struct || nestedMirror.displayStyle == .class {
                 return .optional(extractClassOrStruct(with: nestedMirror))
@@ -142,8 +145,10 @@ extension ValueType {
 
         return isOptional ? .optional(.unknown(type)) : .unknown(type)
     }
+}
 
-    private static func extractClassOrStruct(with mirror: Mirror) -> ValueType {
+extension ValueType {
+    private static func extractClassOrStruct(with mirror: MagicMirror) -> ValueType {
         guard mirror.displayStyle == .class || mirror.displayStyle == .struct else {
             fatalError()
         }
