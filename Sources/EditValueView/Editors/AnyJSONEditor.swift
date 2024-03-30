@@ -37,7 +37,7 @@ struct AnyJSONEditor<Value>: View {
     var editor: some View {
         TextEditor(text: $text)
             .frame(minHeight: 200, maxHeight: .infinity)
-            .border(.black, width: 0.5)
+            .border(Color.iOS(.label), width: 0.5)
             .padding(.vertical)
     }
 

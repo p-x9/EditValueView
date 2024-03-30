@@ -22,7 +22,7 @@ struct DateEditorView: View {
         VStack {
             Text(value.description)
                 .frame(maxWidth: .infinity)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
             DatePicker(key, selection: $value)
                 .datePickerStyle(.graphical)
         }

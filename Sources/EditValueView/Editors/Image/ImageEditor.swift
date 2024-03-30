@@ -116,7 +116,7 @@ struct ImageEditor<Value>: View {
                 .resizable()
                 .scaledToFit()
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
         } else if isOptional {
             Color.iOS.secondarySystemFill
                 .overlay(

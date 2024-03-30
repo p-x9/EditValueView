@@ -34,7 +34,7 @@ struct ColorEditorView<Value>: View {
     var editor: some View {
         ColorPicker(key, selection: $color)
             .padding()
-            .border(.black, width: 0.5)
+            .border(Color.iOS(.label), width: 0.5)
     }
 
     func colorChanged(_ cgColor: CGColor) {

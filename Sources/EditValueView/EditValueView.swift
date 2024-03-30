@@ -95,7 +95,7 @@ public struct EditValueView<Value>: View {
                     if isOptional && shouldShowOptionalEditor {
                         optionalEditor
                             .padding()
-                            .border(.black, width: 0.5)
+                            .border(Color.iOS(.label), width: 0.5)
                             .padding(.vertical)
                     }
 
@@ -191,12 +191,12 @@ public struct EditValueView<Value>: View {
         case let v as Binding<String>:
             TextEditor(text: v)
                 .frame(minHeight: 200, maxHeight: .infinity)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case let v as Binding<Bool>:
             Toggle(key, isOn: v)
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case _ where Value.self is any Numeric.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
@@ -232,18 +232,18 @@ public struct EditValueView<Value>: View {
 
         case _ where Value.self is any CaseIterable.Type:
             CaseIterableEditor($value, key: key)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
             /* Optional Type */
         case let v as Binding<String?> where !isNil:
             TextEditor(text: Binding(v)!)
                 .frame(minHeight: 200, maxHeight: .infinity)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case let v as Binding<Bool?> where !isNil:
             Toggle(key, isOn: Binding(v)!)
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case _ where Value.self is any OptionalNumeric.Type:
             CodableEditorView($value, key: key, isValidType: $isValidType, textStyle: .single)
@@ -279,7 +279,7 @@ public struct EditValueView<Value>: View {
 
         case _ where Value.self is any OptionalCaseIterable.Type:
             CaseIterableEditor($value, key: key)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
             /* Other */
         case _ where Value.self is any Codable.Type:
@@ -397,6 +397,8 @@ struct Item {
         "AA": 0,
         "BB": 234
     ]
+    var anyDictionary: [String: Any] = ["AA": 0]
+
     var cgColor = NSUIColor.yellow.cgColor
     var uiColor = NSUIColor.blue
     var ciColor = CIColor(color: NSUIColor.brown)
@@ -405,7 +407,6 @@ struct Item {
     var nsuiImage = NSUIImage(systemName: "swift")
     var cgImage = NSUIImage(systemName: "swift")?.cgImage
     var ciImage = NSUIImage(systemName: "swift")?.ciImage
-    var anyDictionary: [String: Any] = ["AA": 0]
 #endif
 }
 

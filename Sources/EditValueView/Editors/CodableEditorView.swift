@@ -1,9 +1,9 @@
 //
 //  CodableEditorView.swift
-//  
+//
 //
 //  Created by p-x9 on 2022/10/21.
-//  
+//
 //
 
 import SwiftUI
@@ -68,12 +68,12 @@ struct CodableEditorView<Value>: View {
         case .single:
             TextField("", text: $text)
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case .multiline:
             TextEditor(text: $text)
                 .frame(minHeight: 200, maxHeight: .infinity)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
                 .padding(.vertical)
         }
     }
