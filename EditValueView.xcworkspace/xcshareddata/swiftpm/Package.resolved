@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/p-x9/swiftui-reflection-view.git",
       "state" : {
-        "revision" : "682103c705ec66e66d247baa4244cdeb84ff3ec4",
-        "version" : "0.7.0"
+        "revision" : "ce3b810ecfa1b2e308cbb5192ee4c8c43b1eefa8",
+        "version" : "0.8.0"
       }
     },
     {
