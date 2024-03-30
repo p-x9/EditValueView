@@ -53,7 +53,7 @@ struct CodableEditorView<Value>: View {
     @ViewBuilder
     var typeDescriptionView: some View {
         HStack(alignment: .center, spacing: 0) {
-            TypeInfoView(value)
+            TypeInfoView(valueForTypeDescription)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             Spacer()
         }
@@ -86,5 +86,15 @@ struct CodableEditorView<Value>: View {
         }
         self.value = value
         isValidType = true
+    }
+}
+
+extension CodableEditorView {
+    var valueForTypeDescription: Any {
+        if let type = Value.self as? any DefaultRepresentable.Type,
+           let value = type.defaultValue as? Value {
+            return value
+        }
+        return value
     }
 }
