@@ -34,19 +34,6 @@ struct AnyJSONEditor<Value>: View {
     }
 
     @ViewBuilder
-    var typeDescriptionView: some View {
-        HStack {
-            Text(typeDescription())
-                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(.gray)
-            Spacer()
-        }
-        .padding()
-        .background(Color.iOS.secondarySystemFill)
-        .cornerRadius(8)
-    }
-
-    @ViewBuilder
     var editor: some View {
         TextEditor(text: $text)
             .frame(minHeight: 200, maxHeight: .infinity)
@@ -63,14 +50,5 @@ struct AnyJSONEditor<Value>: View {
         }
         self.value = value
         isValidType = true
-    }
-
-    func typeDescription() -> String {
-        if let optional = value as? (any OptionalType),
-           optional.wrapped == nil,
-           let type = Value.self as? any DefaultRepresentable.Type {
-            return ValueType.extractType(for: Optional.some(type.defaultValue)).typeDescription
-        }
-        return ValueType.extractType(for: value).typeDescription
     }
 }

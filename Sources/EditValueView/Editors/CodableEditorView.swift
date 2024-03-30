@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SwiftUIColor
+import ReflectionView
 
 struct CodableEditorView<Value>: View {
 
@@ -51,13 +52,12 @@ struct CodableEditorView<Value>: View {
 
     @ViewBuilder
     var typeDescriptionView: some View {
-        HStack {
-            Text(typeDescription())
-                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(.gray)
+        HStack(alignment: .center, spacing: 0) {
+            TypeInfoView(value)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             Spacer()
         }
-        .padding()
+        .font(.system(size: 14, design: .monospaced))
         .background(Color.iOS.secondarySystemFill)
         .cornerRadius(8)
     }
@@ -86,14 +86,5 @@ struct CodableEditorView<Value>: View {
         }
         self.value = value
         isValidType = true
-    }
-
-    func typeDescription() -> String {
-        if let optional = value as? (any OptionalType),
-           optional.wrapped == nil,
-           let type = Value.self as? any DefaultRepresentable.Type {
-            return ValueType.extractType(for: Optional.some(type.defaultValue)).typeDescription
-        }
-        return ValueType.extractType(for: value).typeDescription
     }
 }
