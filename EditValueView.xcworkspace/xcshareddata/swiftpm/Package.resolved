@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "swiftui-reflection-view",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/p-x9/swiftui-reflection-view.git",
+      "state" : {
+        "revision" : "ce3b810ecfa1b2e308cbb5192ee4c8c43b1eefa8",
+        "version" : "0.8.0"
+      }
+    },
+    {
       "identity" : "swiftuicolor",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/p-x9/SwiftUIColor.git",

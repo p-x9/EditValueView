@@ -75,7 +75,7 @@ struct SwiftUIImageEditor: View {
                 .resizable()
                 .scaledToFit()
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
         } else {
             Color.iOS.secondarySystemFill
                 .overlay(

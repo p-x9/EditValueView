@@ -1,13 +1,14 @@
 //
 //  CodableEditorView.swift
-//  
+//
 //
 //  Created by p-x9 on 2022/10/21.
-//  
+//
 //
 
 import SwiftUI
 import SwiftUIColor
+import ReflectionView
 
 struct CodableEditorView<Value>: View {
 
@@ -51,13 +52,12 @@ struct CodableEditorView<Value>: View {
 
     @ViewBuilder
     var typeDescriptionView: some View {
-        HStack {
-            Text(typeDescription())
-                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(.gray)
+        HStack(alignment: .center, spacing: 0) {
+            TypeInfoView(valueForTypeDescription)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             Spacer()
         }
-        .padding()
+        .font(.system(size: 14, design: .monospaced))
         .background(Color.iOS.secondarySystemFill)
         .cornerRadius(8)
     }
@@ -68,12 +68,12 @@ struct CodableEditorView<Value>: View {
         case .single:
             TextField("", text: $text)
                 .padding()
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
 
         case .multiline:
             TextEditor(text: $text)
                 .frame(minHeight: 200, maxHeight: .infinity)
-                .border(.black, width: 0.5)
+                .border(Color.iOS(.label), width: 0.5)
                 .padding(.vertical)
         }
     }
@@ -87,13 +87,14 @@ struct CodableEditorView<Value>: View {
         self.value = value
         isValidType = true
     }
+}
 
-    func typeDescription() -> String {
-        if let optional = value as? (any OptionalType),
-           optional.wrapped == nil,
-           let type = Value.self as? any DefaultRepresentable.Type {
-            return ValueType.extractType(for: Optional.some(type.defaultValue)).typeDescription
+extension CodableEditorView {
+    var valueForTypeDescription: Any {
+        if let type = Value.self as? any DefaultRepresentable.Type,
+           let value = type.defaultValue as? Value {
+            return value
         }
-        return ValueType.extractType(for: value).typeDescription
+        return value
     }
 }
